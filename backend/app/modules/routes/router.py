@@ -2,7 +2,8 @@ import uuid
  
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
- 
+
+from app.core.deps import require_admin 
 from app.db.session import get_db
 from app.modules.routes import service
 from app.schemas.route import RouteCreate, RouteRead, StationCreate, StationRead
@@ -10,7 +11,7 @@ from app.schemas.route import RouteCreate, RouteRead, StationCreate, StationRead
 router = APIRouter(prefix="/routes", tags=["routes"])
  
  
-@router.post("", response_model=RouteRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=RouteRead, status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_admin)])
 async def create_route(payload: RouteCreate, db: AsyncSession = Depends(get_db)) -> RouteRead:
     route = await service.create_route(db, payload)
     return RouteRead.model_validate(route)
@@ -23,7 +24,7 @@ async def list_routes(db: AsyncSession = Depends(get_db)) -> list[RouteRead]:
  
  
 @router.post(
-    "/{route_id}/stations", response_model=StationRead, status_code=status.HTTP_201_CREATED
+    "/{route_id}/stations", response_model=StationRead, status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_admin)]
 )
 async def add_station(
     route_id: uuid.UUID, payload: StationCreate, db: AsyncSession = Depends(get_db)

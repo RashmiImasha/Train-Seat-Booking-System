@@ -19,6 +19,25 @@ class CoachType(str, enum.Enum):
 class BookingStatus(str, enum.Enum):
     CONFIRMED = "confirmed"
     CANCELLED = "cancelled"
+
+class UserRole(str, enum.Enum):
+    ADMIN = "admin"
+    PASSENGER = "passenger"
+
+class User(Base):
+    """
+    An account with a role. Only two roles exist: a single hardcoded admin
+    (seeded at startup -- see main.py) and self-registered passengers.
+    Bookings reference user_id (not a free-text passenger name), so a
+    booking is always tied to a real authenticated account.
+    """
+ 
+    __tablename__ = "users"
+ 
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+    role: Mapped[UserRole] = mapped_column(Enum(UserRole, name="user_role"), nullable=False)
  
  
 class Route(Base):
@@ -172,7 +191,9 @@ class Booking(Base):
     destination_station_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("stations.id", ondelete="RESTRICT"), nullable=False
     )
-    passenger_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
+
+
     fare: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
     status: Mapped[BookingStatus] = mapped_column(
         Enum(BookingStatus, name="booking_status"), nullable=False, default=BookingStatus.CONFIRMED
@@ -181,3 +202,4 @@ class Booking(Base):
  
     seat: Mapped["Seat"] = relationship()
     train_schedule: Mapped["TrainSchedule"] = relationship()
+    user: Mapped["User"] = relationship()

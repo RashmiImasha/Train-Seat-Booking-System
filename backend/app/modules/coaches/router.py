@@ -2,7 +2,8 @@ import uuid
  
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
- 
+
+from app.core.deps import require_admin
 from app.db.session import get_db
 from app.modules.coaches import service
 from app.schemas.coach import CoachCreate, CoachRead
@@ -10,7 +11,7 @@ from app.schemas.coach import CoachCreate, CoachRead
 router = APIRouter(prefix="/routes/{route_id}/coaches", tags=["coaches"])
  
  
-@router.post("", response_model=CoachRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=CoachRead, status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_admin)])
 async def add_coach(
     route_id: uuid.UUID, payload: CoachCreate, db: AsyncSession = Depends(get_db)
 ) -> CoachRead:
