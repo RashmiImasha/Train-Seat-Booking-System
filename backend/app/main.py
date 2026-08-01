@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from app.db.models import Base
 from app.db.session import engine
 from app.modules.availability.router import router as availability_router
-#from app.modules.bookings.router import booking_creation_router, booking_router
+from app.modules.bookings.router import booking_creation_router, booking_router
 from app.modules.coaches.router import router as coaches_router
 from app.modules.routes.router import router as routes_router
 from app.modules.schedules.router import router as schedules_router
@@ -16,8 +16,8 @@ app.include_router(routes_router)
 app.include_router(coaches_router)
 app.include_router(schedules_router)
 app.include_router(availability_router)
-#app.include_router(booking_creation_router)
-#app.include_router(booking_router)
+app.include_router(booking_creation_router)
+app.include_router(booking_router)
  
  
 @app.on_event("startup")
