@@ -12,8 +12,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/icon-192.png', 'icons/icon-512.png'],
       manifest: {
-        name: 'LSF Rail — Colombo Fort to Badulla',
-        short_name: 'LSF Rail',
+        name: 'Rail - Colombo Fort to Badulla',
+        short_name: 'Rail-seat',
         description: 'Segment-based seat booking for the Colombo Fort–Badulla line',
         // Brand tokens, matching the design plan (rail-green as the theme color,
         // paper as the background so the splash screen matches the app itself).
