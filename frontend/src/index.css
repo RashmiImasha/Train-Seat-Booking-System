@@ -1,0 +1,89 @@
+@import "tailwindcss";
+ 
+/* ---------------------------------------------------------------------
+   Design tokens — see the design plan: Sri Lanka's hill-country railway
+   (Colombo Fort–Badulla), rendered as a well-kept timetable/ticket, not
+   a generic SaaS dashboard. Deliberately not the cream+terracotta AI
+   default -- paper here is cooler/greener, accent is brass, not clay.
+   --------------------------------------------------------------------- */
+:root {
+  --ink: #17241f;         /* primary text -- deep charcoal-green */
+  --paper: #f1efe4;       /* app background -- warm, slightly green-leaning paper */
+  --paper-raised: #fbfaf3; /* card/surface background, a touch lighter than paper */
+  --rail-green: #1b4b43;  /* brand / primary actions */
+  --rail-green-dark: #123832;
+  --brass: #c89b3c;       /* accent -- used sparingly: highlights, focus, selected state */
+  --brass-dark: #a67e2b;
+  --leaf: #4c7a3d;        /* status: available / success */
+  --leaf-bg: #e6ede0;
+  --clay: #a6503c;        /* status: booked / error / unavailable */
+  --clay-bg: #f3e4df;
+  --line: #ddd8c6;        /* hairline borders/dividers on paper */
+ 
+  --font-display: 'Fraunces', ui-serif, Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+}
+ 
+@theme {
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-paper-raised: var(--paper-raised);
+  --color-rail: var(--rail-green);
+  --color-rail-dark: var(--rail-green-dark);
+  --color-brass: var(--brass);
+  --color-brass-dark: var(--brass-dark);
+  --color-leaf: var(--leaf);
+  --color-leaf-bg: var(--leaf-bg);
+  --color-clay: var(--clay);
+  --color-clay-bg: var(--clay-bg);
+  --color-line: var(--line);
+ 
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+ 
+* {
+  box-sizing: border-box;
+}
+ 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+ 
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+ 
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+ 
+/* Visible keyboard focus everywhere -- accessibility quality floor. */
+:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+ 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,33 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+import { VitePWA } from 'vite-plugin-pwa'
+ 
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['icons/icon-192.png', 'icons/icon-512.png'],
+      manifest: {
+        name: 'LSF Rail — Colombo Fort to Badulla',
+        short_name: 'LSF Rail',
+        description: 'Segment-based seat booking for the Colombo Fort–Badulla line',
+        // Brand tokens, matching the design plan (rail-green as the theme color,
+        // paper as the background so the splash screen matches the app itself).
+        theme_color: '#1B4B43',
+        background_color: '#F1EFE4',
+        display: 'standalone',
+        orientation: 'portrait',
+        start_url: '/',
+        icons: [
+          { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      },
+    }),
+  ],
+})
