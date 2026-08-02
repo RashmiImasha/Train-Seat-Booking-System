@@ -5,13 +5,13 @@ import RegisterPage from './pages/auth/RegisterPage'
 // import SeatMapPage from './pages/passenger/SeatMapPage'
 // import BookingConfirmPage from './pages/passenger/BookingConfirmPage'
 // import MyBookingsPage from './pages/passenger/MyBookingsPage'
-// import RoutesPage from './pages/admin/RoutesPage'
-// import RouteDetailPage from './pages/admin/RouteDetailPage'
-// import SchedulesPage from './pages/admin/SchedulesPage'
-// import AdminLayout from './components/layout/AdminLayout'
+import RoutesPage from './pages/admin/RoutesPage'
+import RouteDetailPage from './pages/admin/RouteDetailPage'
+import SchedulesPage from './pages/admin/SchedulesPage'
+import AdminLayout from './components/layout/AdminLayout'
 // import PassengerLayout from './components/layout/PassengerLayout'
 // import { RequireAuth } from './auth/RequireAuth'
-// import { RequireAdmin } from './auth/RequireAdmin'
+import { RequireAdmin } from './auth/RequireAdmin'
 // import { AdminRedirect } from './auth/AdminRedirect'
 
 function App() {
@@ -29,7 +29,7 @@ function App() {
             <Route path="/my-bookings" element={<MyBookingsPage />} />
           </Route>
         </Route>
-      </Route>
+      </Route> */}
 
       <Route element={<RequireAdmin />}>
         <Route path="/admin" element={<AdminLayout />}>
@@ -37,7 +37,7 @@ function App() {
           <Route path="routes/:routeId" element={<RouteDetailPage />} />
           <Route path="schedules" element={<SchedulesPage />} />
         </Route>
-      </Route> */}
+      </Route>
     </Routes>
   )
 }
