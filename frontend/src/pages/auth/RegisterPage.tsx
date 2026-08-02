@@ -19,7 +19,7 @@ export default function RegisterPage() {
     try {
       await registerPassenger(username, password)
       await login(username, password)
-      navigate('/')
+      navigate('/login')
     } catch (err) {
       setError(err instanceof ApiError ? String(err.detail ?? 'Registration failed') : 'Something went wrong')
     } finally {

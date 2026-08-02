@@ -9,10 +9,9 @@ import RoutesPage from './pages/admin/RoutesPage'
 import RouteDetailPage from './pages/admin/RouteDetailPage'
 import SchedulesPage from './pages/admin/SchedulesPage'
 import AdminLayout from './components/layout/AdminLayout'
-// import PassengerLayout from './components/layout/PassengerLayout'
-// import { RequireAuth } from './auth/RequireAuth'
+import PassengerLayout from './components/layout/PassengerLayout'
+import { RequireAuth } from './auth/RequireAuth'
 import { RequireAdmin } from './auth/RequireAdmin'
-// import { AdminRedirect } from './auth/AdminRedirect'
 
 function App() {
   return (
@@ -20,16 +19,16 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* <Route element={<RequireAuth />}>
-        <Route element={<AdminRedirect />}>
-          <Route element={<PassengerLayout />}>
-            <Route path="/" element={<SearchPage />} />
-            <Route path="/seats" element={<SeatMapPage />} />
-            <Route path="/confirm" element={<BookingConfirmPage />} />
-            <Route path="/my-bookings" element={<MyBookingsPage />} />
-          </Route>
+      <Route element={<RequireAuth />}>
+        
+        <Route element={<PassengerLayout />}>
+          {/* <Route path="/" element={<SearchPage />} />
+          <Route path="/seats" element={<SeatMapPage />} />
+          <Route path="/confirm" element={<BookingConfirmPage />} />
+          <Route path="/my-bookings" element={<MyBookingsPage />} /> */}
         </Route>
-      </Route> */}
+        
+      </Route>
 
       <Route element={<RequireAdmin />}>
         <Route path="/admin" element={<AdminLayout />}>

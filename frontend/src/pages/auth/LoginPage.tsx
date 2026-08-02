@@ -17,8 +17,14 @@ export default function LoginPage() {
     setError(null)
     setSubmitting(true)
     try {
-      await login(username, password)
-      navigate('/')
+        const role =await login(username, password)
+
+        if (role === 'admin') {
+            navigate('/admin/routes')
+        } else {
+            navigate('/')
+        }
+
     } catch (err) {
       setError(err instanceof ApiError ? String(err.detail ?? 'Login failed') : 'Something went wrong')
     } finally {
