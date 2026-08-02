@@ -3,11 +3,11 @@ import uuid
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
  
-from app.core.deps import get_current_user
+from app.core.deps import get_current_user, require_admin
 from app.db.models import User
 from app.db.session import get_db
 from app.modules.bookings import service
-from app.schemas.booking import BookingCreate, BookingRead
+from app.schemas.booking import BookingCreate, BookingRead, BookingDetailRead
  
 booking_creation_router = APIRouter(
     prefix="/schedules/{schedule_id}/seats/{seat_id}/bookings", tags=["bookings"]
@@ -25,7 +25,19 @@ async def create_booking(
 ) -> BookingRead:
     booking = await service.create_booking(db, schedule_id, seat_id, payload, current_user)
     return BookingRead.model_validate(booking)
- 
+
+@booking_router.get("", response_model=list[BookingRead], dependencies=[Depends(require_admin)])
+async def list_bookings(db:AsyncSession = Depends(get_db)) -> list[BookingRead]:
+    bookings = await service.get_all_bookings(db)
+    return [BookingRead.model_validate(b) for b in bookings]
+
+@booking_router.get("/me", response_model=list[BookingDetailRead])
+async def get_all_bookings_per_user(    
+    db: AsyncSession = Depends(get_db),    
+    current_user: User = Depends(get_current_user),
+) -> list[BookingDetailRead]:
+    bookings = await service.list_my_bookings(db, current_user)
+    return [BookingDetailRead.model_validate(b) for b in bookings]
  
 @booking_router.get("/{booking_id}", response_model=BookingRead)
 async def get_booking(

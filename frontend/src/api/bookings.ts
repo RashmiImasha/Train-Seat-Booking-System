@@ -12,8 +12,13 @@ export function createBooking(
   })
 }
 
+// export function listAllBookings() {
+//   return apiRequest<BookingDetail[]>('/bookings')
+// }
+
+// for user
 export function listMyBookings() {
-  return apiRequest<BookingDetail[]>('/bookings')
+  return apiRequest<BookingDetail[]>('/bookings/me')
 }
 
 export function getBooking(bookingId: string) {

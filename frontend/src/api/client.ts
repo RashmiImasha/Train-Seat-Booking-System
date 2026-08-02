@@ -29,6 +29,9 @@ interface RequestOptions {
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  
+  console.log("Current token:", currentToken)
+  
   const url = new URL(path, BASE_URL)
   if (options.params) {
     for (const [key, value] of Object.entries(options.params)) {

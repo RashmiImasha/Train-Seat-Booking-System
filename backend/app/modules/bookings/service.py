@@ -5,11 +5,11 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
  
 from app.core.segments import leg_mask
-from app.db.models import Booking, BookingStatus, Coach, CoachType, Seat, SeatAvailability, Station, User, UserRole
+from app.db.models import Booking, BookingStatus, Coach, CoachType, Seat, SeatAvailability, Station, User, UserRole, Route, TrainSchedule
 from app.modules.fares.service import calculate_fare
 from app.modules.schedules.service import get_schedule_or_404
 from app.schemas.booking import BookingCreate
- 
+
  
 async def _get_reserved_seat_or_404(db: AsyncSession, seat_id: uuid.UUID) -> Seat:
     result = await db.execute(
@@ -81,8 +81,50 @@ async def create_booking(
     await db.commit()
     await db.refresh(booking)
     return booking
- 
- 
+
+async def get_all_bookings(db: AsyncSession) -> list[Booking]:
+    result = await db.execute(select(Booking))
+    return list(result.scalars().all())
+
+
+async def list_my_bookings(db: AsyncSession, user: User) -> list[dict]:
+    result = await db.execute(
+        select(
+            Booking,
+            Route.name.label("route_name"),
+            Seat.seat_number,
+            Coach.coach_number,
+            TrainSchedule.travel_date,
+        )
+        .join(Seat, Booking.seat_id == Seat.id)
+        .join(Coach, Seat.coach_id == Coach.id)
+        .join(TrainSchedule, Booking.train_schedule_id == TrainSchedule.id)
+        .join(Route, TrainSchedule.route_id == Route.id)
+        .where(Booking.user_id == user.id)
+        .order_by(Booking.booked_at.desc())
+    )
+    rows = result.all()
+
+    station_ids = {row.Booking.origin_station_id for row in rows} | {
+        row.Booking.destination_station_id for row in rows
+    }
+    stations_result = await db.execute(select(Station).where(Station.id.in_(station_ids)))
+    station_names = {s.id: s.name for s in stations_result.scalars().all()}
+
+    return [
+        {
+            **{c: getattr(row.Booking, c) for c in Booking.__table__.columns.keys()},
+            "route_name": row.route_name,
+            "seat_number": row.seat_number,
+            "coach_number": row.coach_number,
+            "travel_date": row.travel_date,
+            "origin_station_name": station_names.get(row.Booking.origin_station_id, "Unknown"),
+            "destination_station_name": station_names.get(row.Booking.destination_station_id, "Unknown"),
+        }
+        for row in rows
+    ]
+
+
 async def get_booking_or_404(db: AsyncSession, booking_id: uuid.UUID) -> Booking:
     booking = await db.get(Booking, booking_id)
     if booking is None:

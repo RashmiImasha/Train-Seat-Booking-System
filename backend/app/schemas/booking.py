@@ -1,7 +1,7 @@
 import datetime
 import uuid
 from decimal import Decimal
- 
+
 from pydantic import BaseModel, ConfigDict
  
 from app.db.models import BookingStatus
@@ -27,3 +27,13 @@ class BookingRead(BaseModel):
     fare: Decimal
     status: BookingStatus
     booked_at: datetime.datetime
+
+class BookingDetailRead(BookingRead):
+    route_name: str
+    origin_station_name: str
+    destination_station_name: str
+    coach_number: int
+    seat_number: int
+    travel_date: datetime.date
+
+    
