@@ -14,6 +14,11 @@ class Base(DeclarativeBase):
 class CoachType(str, enum.Enum):
     RESERVED = "reserved"
     UNRESERVED = "unreserved"
+
+class CoachName(str, enum.Enum):
+    CLASS_1 = "1st_class"
+    CLASS_2 = "2nd_class" 
+    CLASS_3 = "3rd_class"
  
  
 class BookingStatus(str, enum.Enum):
@@ -96,6 +101,7 @@ class Coach(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     route_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("routes.id", ondelete="CASCADE"), nullable=False)
     coach_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    coach_name: Mapped[CoachName] = mapped_column(Enum(CoachName, name="coach_name"), nullable=False)
     coach_type: Mapped[CoachType] = mapped_column(Enum(CoachType, name="coach_type"), nullable=False)
     seat_count: Mapped[int] = mapped_column(Integer, nullable=False)
  

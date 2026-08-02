@@ -77,7 +77,7 @@ export default function MyBookingsPage() {
                 <div className="flex items-center justify-between text-sm text-ink/60">
                   <span>{b.travel_date}</span>
                   <span className="font-mono">
-                    Coach {b.coach_number} · Seat {b.seat_number}
+                    Coach {b.coach_number} . {b.coach_name} · Seat {b.seat_number}
                   </span>
                 </div>
               </div>

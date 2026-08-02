@@ -57,6 +57,7 @@ async def get_available_seats(
             seat_number=seat.seat_number,
             coach_id=coach.id,
             coach_number=coach.coach_number,
+            coach_name=coach.coach_name,
         )
         for _availability, seat, coach in result.all()
     ]

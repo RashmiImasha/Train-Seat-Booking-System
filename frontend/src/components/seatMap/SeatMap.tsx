@@ -30,7 +30,7 @@ export function SeatMap({ coaches, availableSeatIds, selectedSeatId, onSelect }:
 
         return (
           <div key={coach.id}>
-            <p className="text-xs font-mono text-ink/50 mb-3 tracking-wide uppercase">Coach {coach.coach_number}</p>
+            <p className="text-xs font-mono text-ink/50 mb-3 tracking-wide uppercase">Coach {coach.coach_number} . {coach.coach_name}</p>
             <div className="inline-flex flex-col gap-2 rounded-2xl border border-line bg-paper-raised p-4">
               {rows.map((row, i) => (
                 <div key={i} className="flex items-center gap-2">

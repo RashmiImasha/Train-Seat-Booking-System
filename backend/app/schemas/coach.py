@@ -1,12 +1,13 @@
 import uuid 
 from pydantic import BaseModel, ConfigDict, Field
  
-from app.db.models import CoachType
+from app.db.models import CoachName, CoachType
  
  
 class CoachCreate(BaseModel):
     coach_number: int = Field(..., ge=1)
     coach_type: CoachType
+    coach_name: CoachName
     seat_count: int = Field(..., ge=1)
  
  
@@ -17,5 +18,6 @@ class CoachRead(BaseModel):
     route_id: uuid.UUID
     coach_number: int
     coach_type: CoachType
+    coach_name: CoachName
     seat_count: int
  

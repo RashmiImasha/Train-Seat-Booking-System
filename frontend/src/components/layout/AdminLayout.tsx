@@ -4,6 +4,7 @@ import { useAuth } from '../../auth/useAuth'
 const navItems = [
   { to: '/admin/routes', label: 'Routes' },
   { to: '/admin/schedules', label: 'Schedules' },
+  { to: '/admin/bookings', label: 'Bookings' },
 ]
 
 export default function AdminLayout() {
@@ -37,7 +38,7 @@ export default function AdminLayout() {
             >
               {item.label}
             </NavLink>
-          ))}a
+          ))}
         </nav>
 
         <div className="px-3 py-4 border-t border-line">

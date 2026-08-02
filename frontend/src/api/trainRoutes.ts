@@ -26,7 +26,11 @@ export function listCoaches(routeId: string) {
 
 export function addCoach(
   routeId: string,
-  payload: { coach_number: number; coach_type: 'reserved' | 'unreserved'; seat_count: number },
+  payload: { 
+    coach_number: number; 
+    coach_type: 'reserved' | 'unreserved'; 
+    coach_name: '1st_class' | '2nd_class' | '3rd_class'; 
+    seat_count: number },
 ) {
   return apiRequest<Coach>(`/routes/${routeId}/coaches`, { method: 'POST', body: payload })
 }

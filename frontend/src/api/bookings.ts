@@ -12,10 +12,6 @@ export function createBooking(
   })
 }
 
-// export function listAllBookings() {
-//   return apiRequest<BookingDetail[]>('/bookings')
-// }
-
 // for user
 export function listMyBookings() {
   return apiRequest<BookingDetail[]>('/bookings/me')
@@ -27,4 +23,12 @@ export function getBooking(bookingId: string) {
 
 export function cancelBooking(bookingId: string) {
   return apiRequest<Booking>(`/bookings/${bookingId}`, { method: 'DELETE' })
+}
+
+export function listAllBookings(filters: { status?: string; travel_date?: string }) {
+  return apiRequest<BookingDetail[]>('/bookings', { params: filters })
+}
+
+export function purgeBooking(bookingId: string) {
+  return apiRequest<void>(`/bookings/${bookingId}/purge`, { method: 'DELETE' })
 }

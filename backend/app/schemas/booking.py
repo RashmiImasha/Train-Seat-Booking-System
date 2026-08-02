@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict
  
-from app.db.models import BookingStatus
+from app.db.models import BookingStatus, CoachName
  
  
 class BookingCreate(BaseModel):
@@ -33,7 +33,8 @@ class BookingDetailRead(BookingRead):
     origin_station_name: str
     destination_station_name: str
     coach_number: int
+    coach_name: CoachName
     seat_number: int
     travel_date: datetime.date
-
+    username: str  
     

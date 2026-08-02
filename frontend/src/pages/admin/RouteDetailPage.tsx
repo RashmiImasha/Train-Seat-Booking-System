@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { addCoach, addStation, listCoaches, listStations } from '../../api/trainRoutes'
-import type { Coach, Station } from '../../types/api'
+import type { Coach, CoachName, Station } from '../../types/api'
 import { ApiError } from '../../api/client'
 import { Button } from '../../components/common/Button'
 import { ErrorBanner, EmptyState } from '../../components/common/StatusBanner'
@@ -18,6 +18,7 @@ export default function RouteDetailPage() {
 
   const [coachNumber, setCoachNumber] = useState('')
   const [coachType, setCoachType] = useState<'reserved' | 'unreserved'>('reserved')
+  const [coachName, setCoachName] = useState<CoachName>('1st_class')
   const [seatCount, setSeatCount] = useState('')
   const [addingCoach, setAddingCoach] = useState(false)
 
@@ -68,6 +69,7 @@ export default function RouteDetailPage() {
         coach_number: Number(coachNumber),
         coach_type: coachType,
         seat_count: Number(seatCount),
+        coach_name: coachName,
       })
       setCoachNumber('')
       setSeatCount('')
@@ -140,14 +142,27 @@ export default function RouteDetailPage() {
           <h2 className="font-display text-lg text-ink mb-3">Coaches</h2>
 
           <form onSubmit={handleAddCoach} className="flex flex-col gap-2 mb-4">
-            <input
+            <div className="flex items-center gap-2 justify-between">
+              <input
               type="number"
               min={1}
               placeholder="Coach number"
               value={coachNumber}
               onChange={(e) => setCoachNumber(e.target.value)}
               className="rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
-            />
+              />
+              <select
+              value={coachName}
+              onChange={(e) => setCoachName(e.target.value as CoachName)}
+              className="rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+            >
+              <option value="1st_class">1st Class</option>
+              <option value="2nd_class">2nd Class</option>
+              <option value="3rd_class">3rd Class</option>
+            </select>
+
+            </div>
+            
             <select
               value={coachType}
               onChange={(e) => setCoachType(e.target.value as 'reserved' | 'unreserved')}

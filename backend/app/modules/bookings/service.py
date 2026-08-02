@@ -1,4 +1,4 @@
-import uuid
+import uuid, datetime
  
 from fastapi import HTTPException, status
 from sqlalchemy import select, update
@@ -82,11 +82,6 @@ async def create_booking(
     await db.refresh(booking)
     return booking
 
-async def get_all_bookings(db: AsyncSession) -> list[Booking]:
-    result = await db.execute(select(Booking))
-    return list(result.scalars().all())
-
-
 async def list_my_bookings(db: AsyncSession, user: User) -> list[dict]:
     result = await db.execute(
         select(
@@ -94,7 +89,8 @@ async def list_my_bookings(db: AsyncSession, user: User) -> list[dict]:
             Route.name.label("route_name"),
             Seat.seat_number,
             Coach.coach_number,
-            TrainSchedule.travel_date,
+            Coach.coach_name,
+            TrainSchedule.travel_date,            
         )
         .join(Seat, Booking.seat_id == Seat.id)
         .join(Coach, Seat.coach_id == Coach.id)
@@ -111,18 +107,95 @@ async def list_my_bookings(db: AsyncSession, user: User) -> list[dict]:
     stations_result = await db.execute(select(Station).where(Station.id.in_(station_ids)))
     station_names = {s.id: s.name for s in stations_result.scalars().all()}
 
+    print("Booking count:", len(rows))
+
+    for row in rows:
+        print(row.Booking.id)
+
     return [
         {
             **{c: getattr(row.Booking, c) for c in Booking.__table__.columns.keys()},
             "route_name": row.route_name,
             "seat_number": row.seat_number,
             "coach_number": row.coach_number,
+            "coach_name": row.coach_name,
             "travel_date": row.travel_date,
+            "origin_station_name": station_names.get(row.Booking.origin_station_id, "Unknown"),
+            "destination_station_name": station_names.get(row.Booking.destination_station_id, "Unknown"),
+            "username": user.username,
+        }
+        for row in rows
+    ]
+
+async def list_all_bookings(
+    db: AsyncSession, status: BookingStatus | None = None, travel_date: datetime.date | None = None
+) -> list[dict]:
+    """
+    Admin-facing listing across ALL users, with optional filters -- reuses
+    the same denormalization approach as list_my_bookings, just without the
+    user_id restriction and with status/date filters layered on.
+    """
+    query = (
+        select(
+            Booking,
+            Route.name.label("route_name"),
+            Seat.seat_number,
+            Coach.coach_number,
+            Coach.coach_name,
+            TrainSchedule.travel_date,
+            User.username,
+        )
+        .join(Seat, Booking.seat_id == Seat.id)
+        .join(Coach, Seat.coach_id == Coach.id)
+        .join(TrainSchedule, Booking.train_schedule_id == TrainSchedule.id)
+        .join(Route, TrainSchedule.route_id == Route.id)
+        .join(User, Booking.user_id == User.id)
+    )
+    if status is not None:
+        query = query.where(Booking.status == status)
+    if travel_date is not None:
+        query = query.where(TrainSchedule.travel_date == travel_date)
+    query = query.order_by(Booking.booked_at.desc())
+
+    result = await db.execute(query)
+    rows = result.all()
+
+    station_ids = {row.Booking.origin_station_id for row in rows} | {
+        row.Booking.destination_station_id for row in rows
+    }
+    stations_result = await db.execute(select(Station).where(Station.id.in_(station_ids)))
+    station_names = {s.id: s.name for s in stations_result.scalars().all()}
+
+    return [
+        {
+            **{c: getattr(row.Booking, c) for c in Booking.__table__.columns.keys()},
+            "route_name": row.route_name,
+            "seat_number": row.seat_number,
+            "coach_number": row.coach_number,
+            "coach_name": row.coach_name,
+            "travel_date": row.travel_date,
+            "username": row.username,
             "origin_station_name": station_names.get(row.Booking.origin_station_id, "Unknown"),
             "destination_station_name": station_names.get(row.Booking.destination_station_id, "Unknown"),
         }
         for row in rows
     ]
+
+
+async def delete_booking(db: AsyncSession, booking_id: uuid.UUID) -> None:
+    """
+    Hard-deletes a booking row -- only permitted once it's already
+    cancelled. A CONFIRMED booking must be cancelled first (which frees its
+    seat segments); purge only ever removes history, never live occupancy.
+    """
+    booking = await get_booking_or_404(db, booking_id)
+    if booking.status != BookingStatus.CANCELLED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only cancelled bookings can be permanently deleted -- cancel it first",
+        )
+    await db.delete(booking)
+    await db.commit()
 
 
 async def get_booking_or_404(db: AsyncSession, booking_id: uuid.UUID) -> Booking:

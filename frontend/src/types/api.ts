@@ -3,6 +3,7 @@
 // if it grows unwieldy.
 
 export type CoachType = 'reserved' | 'unreserved'
+export type CoachName = '1st_class' | '2nd_class' | '3rd_class'
 export type UserRole = 'admin' | 'passenger'
 export type BookingStatus = 'confirmed' | 'cancelled'
 
@@ -24,6 +25,7 @@ export interface Coach {
   route_id: string
   coach_number: number
   coach_type: CoachType
+  coach_name: CoachName
   seat_count: number
 }
 
@@ -37,6 +39,7 @@ export interface CoachWithSeats {
   id: string
   coach_number: number
   coach_type: CoachType
+  coach_name: CoachName
   seat_count: number
   seats: Seat[]
 }
@@ -52,6 +55,7 @@ export interface AvailableSeat {
   seat_number: number
   coach_id: string
   coach_number: number
+  coach_name: CoachName
 }
 
 export interface Booking {
@@ -71,8 +75,10 @@ export interface BookingDetail extends Booking {
   origin_station_name: string
   destination_station_name: string
   coach_number: number
+  coach_name: CoachName
   seat_number: number
   travel_date: string
+  username: string
 }
 
 export interface TokenResponse {

@@ -15,6 +15,7 @@ async def add_coach(db: AsyncSession, route_id: uuid.UUID, payload: CoachCreate)
         route_id=route_id,
         coach_number=payload.coach_number,
         coach_type=payload.coach_type,
+        coach_name=payload.coach_name,
         seat_count=payload.seat_count,
     )
     db.add(coach)

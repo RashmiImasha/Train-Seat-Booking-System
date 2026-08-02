@@ -5,6 +5,7 @@ import SearchPage from './pages/passenger/SearchPage'
 import SeatMapPage from './pages/passenger/SeatMapPage'
 import BookingConfirmPage from './pages/passenger/BookingConfirmPage'
 import MyBookingsPage from './pages/passenger/MyBookingPage'
+import BookingsPage from './pages/admin/BookingsPage'
 import RoutesPage from './pages/admin/RoutesPage'
 import RouteDetailPage from './pages/admin/RouteDetailPage'
 import SchedulesPage from './pages/admin/SchedulesPage'
@@ -35,6 +36,7 @@ function App() {
           <Route path="routes" element={<RoutesPage />} />
           <Route path="routes/:routeId" element={<RouteDetailPage />} />
           <Route path="schedules" element={<SchedulesPage />} />
+          <Route path="bookings" element={<BookingsPage />} />
         </Route>
       </Route>
     </Routes>
