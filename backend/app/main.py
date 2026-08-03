@@ -6,7 +6,7 @@ from app.config import ADMIN_PASSWORD, ADMIN_USERNAME, get_settings
 from app.core.security import hash_password 
 from app.db.models import Base, User, UserRole
 from app.db.session import AsyncSessionLocal, engine
-from app.modules.availability.router import router as availability_router
+from app.modules.availability.router import router as availability_router, seat_map_router
 from app.modules.bookings.router import booking_creation_router, booking_router
 from app.modules.coaches.router import router as coaches_router
 from app.modules.routes.router import router as routes_router
@@ -35,6 +35,7 @@ app.include_router(availability_router)
 app.include_router(booking_creation_router)
 app.include_router(booking_router)
 app.include_router(fares_router)
+app.include_router(seat_map_router)
 
 async def _seed_admin_user() -> None:
     

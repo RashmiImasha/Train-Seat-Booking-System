@@ -56,6 +56,7 @@ class Route(Base):
  
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
+    train_name: Mapped[str] = mapped_column(String(255), nullable=False)
  
     stations: Mapped[list["Station"]] = relationship(
         back_populates="route", cascade="all, delete-orphan", order_by="Station.sequence_order"

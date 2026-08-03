@@ -9,7 +9,10 @@ from app.schemas.route import RouteCreate, StationCreate
  
  
 async def create_route(db: AsyncSession, payload: RouteCreate) -> Route:
-    route = Route(name=payload.name)
+    route = Route(
+        name=payload.name,
+        train_name=payload.train_name,
+    )
     db.add(route)
     await db.commit()
     await db.refresh(route)

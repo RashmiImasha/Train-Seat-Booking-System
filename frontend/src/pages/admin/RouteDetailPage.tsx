@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { addCoach, addStation, listCoaches, listStations } from '../../api/trainRoutes'
 import type { Coach, CoachName, Station } from '../../types/api'
 import { ApiError } from '../../api/client'

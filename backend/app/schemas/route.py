@@ -4,6 +4,7 @@ from pydantic import BaseModel, ConfigDict, Field
  
 class RouteCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
+    train_name: str = Field(..., min_length=1, max_length=255)
  
  
 class RouteRead(BaseModel):
@@ -11,6 +12,7 @@ class RouteRead(BaseModel):
  
     id: uuid.UUID
     name: str
+    train_name: str
  
  
 class StationCreate(BaseModel):
