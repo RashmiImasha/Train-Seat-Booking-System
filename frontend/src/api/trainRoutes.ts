@@ -5,13 +5,13 @@ export function listRoutes() {
   return apiRequest<Route[]>('/routes')
 }
 
-export function createRoute(name: string) {
-  return apiRequest<Route>('/routes', { method: 'POST', body: { name } })
+export function createRoute(name: string, train_name: string) {
+  return apiRequest<Route>('/routes', { method: 'POST', body: { name, train_name } })
 }
 
 export function listStations(routeId: string) {
   return apiRequest<Station[]>(`/routes/${routeId}/stations`)
-}
+}   
 
 export function addStation(
   routeId: string,

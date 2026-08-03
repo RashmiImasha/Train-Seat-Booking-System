@@ -73,7 +73,7 @@ export default function BookingConfirmPage() {
       <h1 className="font-display text-2xl text-ink mb-6">{confirmed ? 'Booked' : 'Confirm your seat'}</h1>
 
       {/* Ticket stub card */}
-      <div className="rounded-2xl border border-line bg-paper-raised shadow-sm overflow-hidden">
+      <div className="rounded-2xl border border-gray-green bg-paper-raised shadow-sm overflow-hidden">
         <div className="p-5">
           <p className="text-xs font-mono text-ink/50 uppercase tracking-wide mb-1">{state.routeName}</p>
           <div className="flex items-center justify-between mb-4">
@@ -96,7 +96,7 @@ export default function BookingConfirmPage() {
         </div>
 
         {/* Perforation */}
-        <div className="relative border-t border-dashed border-line">
+        <div className="relative border-t border-dashed border-gray-green">
           <div className="absolute -left-3 -top-3 h-6 w-6 rounded-full bg-paper" />
           <div className="absolute -right-3 -top-3 h-6 w-6 rounded-full bg-paper" />
         </div>

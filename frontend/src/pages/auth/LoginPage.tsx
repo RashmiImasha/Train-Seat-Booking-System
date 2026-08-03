@@ -33,7 +33,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-paper">
+    <div className="flex w-full items-center justify-center bg-paper ">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-3">
@@ -49,7 +49,7 @@ export default function LoginPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="bg-paper-raised rounded-2xl border border-line p-6 shadow-sm"
+          className="bg-paper-raised rounded-2xl border border-gray-green p-6 shadow-sm"
         >
           <div className="mb-4">
             <label htmlFor="username" className="block text-sm font-medium text-ink mb-1.5">
@@ -61,7 +61,7 @@ export default function LoginPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-full rounded-lg border border-line bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
             />
           </div>
 
@@ -75,7 +75,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded-lg border border-line bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
             />
           </div>
 
@@ -86,7 +86,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-lg bg-rail text-white font-medium py-2.5 hover:bg-rail-dark transition-colors disabled:opacity-60"
+            className="w-full rounded-lg bg-rail-green text-white font-medium py-2.5 hover:bg-rail-green-dark transition-colors disabled:opacity-60"
           >
             {submitting ? 'Signing in…' : 'Sign in'}
           </button>

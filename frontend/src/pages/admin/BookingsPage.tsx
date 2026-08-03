@@ -4,13 +4,21 @@ import type { BookingDetail } from '../../types/api'
 import { ApiError } from '../../api/client'
 import { Button } from '../../components/common/Button'
 import { ErrorBanner, EmptyState } from '../../components/common/StatusBanner'
+import { SectionHeader } from '../../components/common/SectionHeader.tsx'
+import { TextInput } from '../../components/common/TextInput.tsx'
+import { SelectInput } from '../../components/common/SelectInput'
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<BookingDetail[] | null>(null)
-  const [statusFilter, setStatusFilter] = useState('')
-  const [dateFilter, setDateFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState('confirmed')
+  // const [dateFilter, setDateFilter] = useState('')
+  const [dateFilter, setDateFilter] = useState(() => {
+    return new Date().toISOString().split('T')[0]
+  })
   const [error, setError] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const totalCount = bookings?.length ?? 0
+  const totalIncome = (bookings ?? []).reduce((sum, b) => sum + parseFloat(b.fare), 0)
 
   async function load() {
     try {
@@ -45,44 +53,80 @@ export default function BookingsPage() {
   }
 
   return (
-    <div className="px-8 py-8 max-w-5xl">
-      <h1 className="font-display text-2xl text-ink mb-1">All Bookings</h1>
-      <p className="text-sm text-ink/60 mb-6">Every booking across all passengers.</p>
-
-      <div className="flex gap-2 mb-6">
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
-        >
-          <option value="">All statuses</option>
-          <option value="confirmed">Confirmed</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
-        <input
-          type="date"
-          value={dateFilter}
-          onChange={(e) => setDateFilter(e.target.value)}
-          className="rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+    <div className="flex flex-col w-full">
+      <div className="pb-7">
+        <SectionHeader
+          title="All Bookings"
+          description="Every booking across all passengers"
         />
-        {(statusFilter || dateFilter) && (
-          <Button variant="secondary" onClick={() => { setStatusFilter(''); setDateFilter('') }}>
-            Clear filters
-          </Button>
-        )}
       </div>
+      
+      <div className="flex items-center gap-10 mb-4 p-3 rounded-lg bg-form-green w-full">
+        <div className="flex items-center gap-x-10 w-1/2 ">
+          <SelectInput
+            label='Booking Status:'
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="confirmed">Confirmed</option>
+            <option value="cancelled">Cancelled</option>
+            
+          </SelectInput>
+
+          <TextInput
+            label='Travel Date:'
+            type="date"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+          />
+        </div>       
+        
+        
+      </div>
+
+      {bookings !== null && dateFilter && (
+        <div className='flex items-center gap-10 mb-8 p-3 rounded-lg bg-form-green w-full'>
+          <div className="flex gap-10 w-1/2">
+          <div className="flex items-center">
+            <p className="text-sm font-medium text-ink">
+              {statusFilter === 'cancelled' ? 'Cancelled bookings :' : 'Confirmed bookings :'}
+            </p>
+            <div className="rounded-lg border border-gray-green bg-paper-raised px-3 py-2 ml-2">            
+              <p className="font-mono text-sm text-ink">{totalCount}</p>
+            </div>
+          </div>
+          
+          
+          <div className="flex items-center">
+            <p className="text-sm font-medium text-ink">
+              {statusFilter === 'cancelled' ? 'Lost revenue :' : 'Total income :'}
+            </p>
+            <div className="rounded-lg border border-gray-green bg-paper-raised px-3 py-2 ml-2">
+            
+              <p className="font-mono text-sm text-ink">LKR {totalIncome.toFixed(2)}</p>
+            </div>
+          </div>
+        </div>
+        </div>
+      )}
 
       {error && <div className="mb-4"><ErrorBanner>{error}</ErrorBanner></div>}
 
       {bookings === null ? (
         <p className="text-sm text-ink/50">Loading…</p>
       ) : bookings.length === 0 ? (
-        <EmptyState title="No bookings match these filters" />
+        (statusFilter === 'cancelled' ? (
+            <EmptyState title="No cancelled bookings for the selected date" />
+          ) : (
+            <EmptyState title="No confirmed bookings for the selected date" />
+          )
+        )
       ) : (
-        <div className="rounded-xl border border-line bg-paper-raised overflow-hidden overflow-x-auto">
+        <div className="rounded-xl border border-gray-green bg-paper-raised overflow-hidden overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-line text-left text-ink/50 text-xs uppercase tracking-wide">
+              <tr className="border-b border-gray-green text-left text-ink/50 text-xs uppercase tracking-wide">
+                <th className="px-4 py-2.5">No.</th>
                 <th className="px-4 py-2.5">Passenger</th>
                 <th className="px-4 py-2.5">Route</th>
                 <th className="px-4 py-2.5">Leg</th>
@@ -94,8 +138,10 @@ export default function BookingsPage() {
               </tr>
             </thead>
             <tbody>
-              {bookings.map((b) => (
-                <tr key={b.id} className="border-b border-line last:border-b-0">
+              {bookings.map((b, i) => (
+                <tr key={b.id} className={`border-b border-gray-green last:border-b-0 
+                  ${i % 2 === 0 ? "bg-white" : "bg-gray-100"}`}>
+                  <td className="px-4 py-2.5 text-ink/50 font-mono">{i + 1}</td>
                   <td className="px-4 py-2.5 font-mono">{b.username}</td>
                   <td className="px-4 py-2.5">{b.route_name}</td>
                   <td className="px-4 py-2.5">

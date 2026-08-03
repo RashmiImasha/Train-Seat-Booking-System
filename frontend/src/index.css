@@ -9,35 +9,63 @@
 :root {
   --ink: #17241f;         /* primary text -- deep charcoal-green */
   --paper: #f1efe4;       /* app background -- warm, slightly green-leaning paper */
-  --paper-raised: #fbfaf3; /* card/surface background, a touch lighter than paper */
-  --rail-green: #1b4b43;  /* brand / primary actions */
+   /* card/surface background, a touch lighter than paper */
+    /* brand / primary actions */
   --rail-green-dark: #123832;
-  --brass: #c89b3c;       /* accent -- used sparingly: highlights, focus, selected state */
-  --brass-dark: #a67e2b;
-  --leaf: #4c7a3d;        /* status: available / success */
+  
   --leaf-bg: #e6ede0;
   --clay: #a6503c;        /* status: booked / error / unavailable */
   --clay-bg: #f3e4df;
   --line: #ddd8c6;        /* hairline borders/dividers on paper */
- 
+  
+  --light-green: #A8C4A8;
+
+
+
+
+  --soft-mint-green: #CCEECC;    
+  --deep-rail-green: #325B54;
+  --rail-green: #1b4b43;
+  --paper-raised: #fbfaf3;
+  --form-green: #EDF3ED;
+  --gray-green: #D7E5D2;
+  --leaf: #4c7a3d;    
+  --light-yellow: #c7c500;    /* status: available / success */
+
+
+
+
+
+
   --font-display: 'Fraunces', ui-serif, Georgia, serif;
   --font-body: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
 }
  
 @theme {
+
+  --color-soft-mint-green: var(--soft-mint-green);
+  --color-deep-rail-green: var(--deep-rail-green);
+  --color-rail-green: var(--rail-green);  
+  --color-gray-green: var(--gray-green);
+  --color-paper-raised: var(--paper-raised);
+  --color-form-green: var(--form-green);
+  --color-leaf: var(--leaf);
+  --color-light-yellow: var(--light-yellow);
+
+
+
+  --color-light-green: var(--light-green);
+
   --color-ink: var(--ink);
   --color-paper: var(--paper);
-  --color-paper-raised: var(--paper-raised);
-  --color-rail: var(--rail-green);
+  
   --color-rail-dark: var(--rail-green-dark);
-  --color-brass: var(--brass);
-  --color-brass-dark: var(--brass-dark);
-  --color-leaf: var(--leaf);
+  
+  
   --color-leaf-bg: var(--leaf-bg);
   --color-clay: var(--clay);
   --color-clay-bg: var(--clay-bg);
-  --color-line: var(--line);
  
   --font-display: var(--font-display);
   --font-body: var(--font-body);
@@ -61,6 +89,7 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+
 }
  
 h1,

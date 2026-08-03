@@ -82,7 +82,7 @@ export default function SearchPage() {
           <select
             value={selectedRouteId}
             onChange={(e) => setSelectedRouteId(e.target.value)}
-            className="w-full rounded-lg border border-line bg-white px-3 py-2.5 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+            className="w-full rounded-lg border border-gray-green bg-white px-3 py-2.5 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
           >
             {routes.length === 0 && <option value="">No routes available</option>}
             {routes.map((r) => (
@@ -99,7 +99,7 @@ export default function SearchPage() {
             <select
               value={originId}
               onChange={(e) => setOriginId(e.target.value)}
-              className="w-full rounded-lg border border-line bg-white px-3 py-2.5 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2.5 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
             >
               {stations.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -113,7 +113,7 @@ export default function SearchPage() {
             <select
               value={destinationId}
               onChange={(e) => setDestinationId(e.target.value)}
-              className="w-full rounded-lg border border-line bg-white px-3 py-2.5 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2.5 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
             >
               {stations.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -131,7 +131,7 @@ export default function SearchPage() {
             value={travelDate}
             onChange={(e) => setTravelDate(e.target.value)}
             required
-            className="w-full rounded-lg border border-line bg-white px-3 py-2.5 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+            className="w-full rounded-lg border border-gray-green bg-white px-3 py-2.5 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
           />
         </div>
 

@@ -5,6 +5,9 @@ import type { Coach, CoachName, Station } from '../../types/api'
 import { ApiError } from '../../api/client'
 import { Button } from '../../components/common/Button'
 import { ErrorBanner, EmptyState } from '../../components/common/StatusBanner'
+import { SectionHeader } from '../../components/common/SectionHeader.tsx'
+import { TextInput } from '../../components/common/TextInput.tsx'
+import { SelectInput } from '../../components/common/SelectInput.tsx'
 
 export default function RouteDetailPage() {
   const { routeId } = useParams<{ routeId: string }>()
@@ -82,38 +85,45 @@ export default function RouteDetailPage() {
   }
 
   return (
-    <div className="px-8 py-8 max-w-4xl">
-      <Link to="/admin/routes" className="text-sm text-rail font-medium hover:text-brass-dark">
-        ← Routes
-      </Link>
-      <h1 className="font-display text-2xl text-ink mt-2 mb-6">Route configuration</h1>
+    <div className="flex flex-col w-full">
 
-      {error && <div className="mb-6"><ErrorBanner>{error}</ErrorBanner></div>}
+      <div className="pb-7">
+        <SectionHeader
+          backTo='/admin/routes'
+          backLabel='Routes'
+          description="Route configuration"
+        />
+      </div>
+      
+      {error && <div className="mb-4"><ErrorBanner>{error}</ErrorBanner></div>}
 
-      <div className="grid grid-cols-2 gap-8">
+      <div className="grid grid-cols-2 gap-8 ">
         {/* Stations */}
-        <section>
-          <h2 className="font-display text-lg text-ink mb-3">Stations</h2>
+        <section className='rounded-lg flex flex-col w-full overflow-hidden bg-form-green px-3 pt-5 pb-16'>
+          <p className="text-ink font-semibold pb-5">Stations</p>
 
           <form onSubmit={handleAddStation} className="flex flex-col gap-2 mb-4">
-            <input
+            <TextInput
+              label='Station Name:'
               type="text"
               placeholder="Station name"
               value={stationName}
               onChange={(e) => setStationName(e.target.value)}
-              className="rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
             />
-            <input
+            <TextInput
+              label='Distance:'
               type="number"
               min={0}
               placeholder="Distance from previous station (km)"
               value={stationDistance}
               onChange={(e) => setStationDistance(e.target.value)}
-              className="rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+              className='ml-8'
             />
-            <Button type="submit" variant="secondary" disabled={addingStation}>
+            <div className='flex w-full justify-end items-end'>
+              <Button type="submit" variant="secondary" disabled={addingStation}>
               {addingStation ? 'Adding…' : 'Add station'}
-            </Button>
+              </Button>
+            </div>
           </form>
 
           {stations === null ? (
@@ -121,9 +131,9 @@ export default function RouteDetailPage() {
           ) : stations.length === 0 ? (
             <EmptyState title="No stations yet" hint="Stations must be added in order along the route." />
           ) : (
-            <ol className="rounded-xl border border-line bg-paper-raised overflow-hidden">
+            <ol className="rounded-xl border border-gray-green bg-paper-raised h-64 overflow-y-scroll ">
               {stations.map((s) => (
-                <li key={s.id} className="flex items-center justify-between px-4 py-2.5 border-b border-line last:border-b-0">
+                <li key={s.id} className="flex items-center justify-between px-4 py-2.5 border-b border-gray-green last:border-b-0">
                   <span className="text-sm text-ink">
                     <span className="font-mono text-ink/40 mr-2">{s.sequence_order}</span>
                     {s.name}
@@ -138,50 +148,60 @@ export default function RouteDetailPage() {
         </section>
 
         {/* Coaches */}
-        <section>
-          <h2 className="font-display text-lg text-ink mb-3">Coaches</h2>
+        <section className='rounded-lg flex flex-col w-full overflow-hidden bg-form-green px-3 pt-5 pb-16'>
+          <p className="text-ink font-semibold pb-5">Coaches</p>
 
-          <form onSubmit={handleAddCoach} className="flex flex-col gap-2 mb-4">
-            <div className="flex items-center gap-2 justify-between">
-              <input
-              type="number"
-              min={1}
-              placeholder="Coach number"
-              value={coachNumber}
-              onChange={(e) => setCoachNumber(e.target.value)}
-              className="rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
-              />
-              <select
-              value={coachName}
-              onChange={(e) => setCoachName(e.target.value as CoachName)}
-              className="rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
-            >
-              <option value="1st_class">1st Class</option>
-              <option value="2nd_class">2nd Class</option>
-              <option value="3rd_class">3rd Class</option>
-            </select>
+          <form onSubmit={handleAddCoach} className="flex flex-col gap-2 mb-4">            
+            <div className="flex items-center gap-10 justify-between ">
+              <SelectInput
+                label='Coach Class:'
+                id='coachType'
+                value={coachName}
+                onChange={(e) => setCoachName(e.target.value as CoachName)}  
+                className='ml-4'            
+              >
+                <option value="1st_class">1st Class</option>
+                <option value="2nd_class">2nd Class</option>
+                <option value="3rd_class">3rd Class</option>
+              </SelectInput>
 
+              <SelectInput
+                label='Coach Type:'
+                id='coachType'
+                value={coachType}
+                onChange={(e) => setCoachType(e.target.value as 'reserved' | 'unreserved')}
+              >
+                <option value="reserved">Reserved</option>
+                <option value="unreserved">Unreserved</option>             
+
+              </SelectInput>
             </div>
-            
-            <select
-              value={coachType}
-              onChange={(e) => setCoachType(e.target.value as 'reserved' | 'unreserved')}
-              className="rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
-            >
-              <option value="reserved">Reserved</option>
-              <option value="unreserved">Unreserved</option>
-            </select>
-            <input
-              type="number"
-              min={1}
-              placeholder="Seat count"
-              value={seatCount}
-              onChange={(e) => setSeatCount(e.target.value)}
-              className="rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
-            />
-            <Button type="submit" variant="secondary" disabled={addingCoach}>
+
+            <div className="flex items-center gap-10 justify-between">
+              <TextInput
+                label='Coach Number:'
+                type="number"
+                min={1}
+                placeholder="Coach number"
+                value={coachNumber}
+                onChange={(e) => setCoachNumber(e.target.value)}
+              />
+
+              <TextInput
+                label='Seat Count:'
+                type="number"
+                min={1}
+                placeholder="Seat count"
+                value={seatCount}
+                onChange={(e) => setSeatCount(e.target.value)}
+              />
+            </div>   
+            <div className='flex w-full justify-end items-end'>
+              <Button type="submit" variant="secondary" disabled={addingCoach}>
               {addingCoach ? 'Adding…' : 'Add coach'}
-            </Button>
+              </Button>
+
+            </div>        
           </form>
 
           {coaches === null ? (
@@ -189,9 +209,9 @@ export default function RouteDetailPage() {
           ) : coaches.length === 0 ? (
             <EmptyState title="No coaches yet" />
           ) : (
-            <ul className="rounded-xl border border-line bg-paper-raised overflow-hidden">
+            <ul className="rounded-xl border border-gray-green bg-paper-raised overflow-hidden">
               {coaches.map((c) => (
-                <li key={c.id} className="flex items-center justify-between px-4 py-2.5 border-b border-line last:border-b-0">
+                <li key={c.id} className="flex items-center justify-between px-4 py-2.5 border-b border-gray-green last:border-b-0">
                   <span className="text-sm text-ink">Coach {c.coach_number}</span>
                   <span className="flex items-center gap-3">
                     <span

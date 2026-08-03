@@ -10,6 +10,7 @@ export type BookingStatus = 'confirmed' | 'cancelled'
 export interface Route {
   id: string
   name: string
+  train_name: string
 }
 
 export interface Station {
@@ -91,4 +92,18 @@ export interface User {
   id: string
   username: string
   role: UserRole
+}
+
+export interface BookedSegment {
+  origin_station_name: string
+  destination_station_name: string
+}
+
+export interface SeatMapEntry {
+  seat_id: string
+  seat_number: number
+  coach_id: string
+  coach_number: number
+  status: 'free' | 'partial' | 'full'
+  booked_segments: BookedSegment[]
 }

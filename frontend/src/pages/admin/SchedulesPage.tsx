@@ -5,6 +5,9 @@ import type { Route, TrainSchedule } from '../../types/api'
 import { ApiError } from '../../api/client'
 import { Button } from '../../components/common/Button'
 import { ErrorBanner, EmptyState } from '../../components/common/StatusBanner'
+import { TextInput } from '../../components/common/TextInput'
+import { SelectInput } from '../../components/common/SelectInput'
+import { SectionHeader } from '../../components/common/SectionHeader.tsx'
 
 export default function SchedulesPage() {
   const [routes, setRoutes] = useState<Route[]>([])
@@ -53,32 +56,46 @@ export default function SchedulesPage() {
   const routeName = (id: string) => routes.find((r) => r.id === id)?.name ?? id
 
   return (
-    <div className="px-8 py-8 max-w-3xl">
-      <h1 className="font-display text-2xl text-ink mb-1">Schedules</h1>
-      <p className="text-sm text-ink/60 mb-6">Run a route on a specific date.</p>
+    <div className="flex flex-col w-full">
 
-      <form onSubmit={handleCreate} className="flex gap-2 mb-8">
-        <select
+      <div className="pb-7">
+        <SectionHeader
+          title="Schedules"
+          description="Run a route on a specific date"
+        />
+      </div>
+
+      <form onSubmit={handleCreate} className="flex items-center gap-10 mb-8 p-3 rounded-lg bg-form-green w-full">
+        <div className="flex items-center gap-x-10 w-1/2">
+          
+          <SelectInput
+          label='Train Route:'
           value={selectedRoute}
           onChange={(e) => setSelectedRoute(e.target.value)}
-          className="rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
-        >
-          {routes.length === 0 && <option value="">No routes yet</option>}
-          {routes.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.name}
-            </option>
-          ))}
-        </select>
-        <input
-          type="date"
-          value={travelDate}
-          onChange={(e) => setTravelDate(e.target.value)}
-          className="rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
-        />
-        <Button type="submit" disabled={creating || routes.length === 0}>
+          >
+            {routes.length === 0 && <option value="">No routes yet</option>}
+            {routes.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.name}
+              </option>
+            ))}
+
+          </SelectInput>
+          
+          
+          <TextInput
+            label='Travel Date:'
+            id="traveldate"
+            type="date"
+            value={travelDate}
+            onChange={(e) => setTravelDate(e.target.value)} 
+                  
+          />
+        </div>
+        <Button type="submit" disabled={creating}>
           {creating ? 'Creating…' : 'Create schedule'}
-        </Button>
+        </Button>  
+        
       </form>
 
       {error && <div className="mb-4"><ErrorBanner>{error}</ErrorBanner></div>}
@@ -88,9 +105,10 @@ export default function SchedulesPage() {
       ) : schedules.length === 0 ? (
         <EmptyState title="No schedules yet" hint="Create one above once a route has stations and coaches." />
       ) : (
-        <div className="rounded-xl border border-line bg-paper-raised overflow-hidden">
+        <div className="rounded-lg flex flex-col w-full overflow-hidden bg-form-green px-3 py-5">
+          <p className='text-ink font-semibold pb-5'>Train Schedules</p>
           {schedules.map((s) => (
-            <div key={s.id} className="flex items-center justify-between px-4 py-3 border-b border-line last:border-b-0">
+            <div key={s.id} className="bg-paper-raised flex items-center justify-between rounded-lg mb-3 px-4 py-3 border border-gray-green last:border-b-0 hover:bg-white transition-colors">
               <span className="text-sm text-ink">{routeName(s.route_id)}</span>
               <span className="text-sm font-mono text-ink/60">{s.travel_date}</span>
             </div>

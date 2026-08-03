@@ -55,7 +55,7 @@ export default function MyBookingsPage() {
             <div
               key={b.id}
               className={`rounded-2xl border bg-paper-raised shadow-sm overflow-hidden ${
-                b.status === 'cancelled' ? 'border-line opacity-60' : 'border-line'
+                b.status === 'cancelled' ? 'border-gray-green opacity-60' : 'border-gray-green'
               }`}
             >
               <div className="p-4">
@@ -82,7 +82,7 @@ export default function MyBookingsPage() {
                 </div>
               </div>
 
-              <div className="border-t border-dashed border-line px-4 py-3 flex items-center justify-between">
+              <div className="border-t border-dashed border-gray-green px-4 py-3 flex items-center justify-between">
                 <span className="font-mono text-lg text-ink font-semibold">LKR {b.fare}</span>
                 {b.status === 'confirmed' && (
                   <Button

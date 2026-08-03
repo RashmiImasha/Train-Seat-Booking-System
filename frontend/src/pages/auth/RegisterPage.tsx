@@ -35,7 +35,7 @@ export default function RegisterPage() {
           <p className="text-sm text-ink/60 mt-1 font-mono tracking-wide">LSF Rail · Passenger</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-paper-raised rounded-2xl border border-line p-6 shadow-sm">
+        <form onSubmit={handleSubmit} className="bg-paper-raised rounded-2xl border border-gray-green p-6 shadow-sm">
           <div className="mb-4">
             <label htmlFor="username" className="block text-sm font-medium text-ink mb-1.5">
               Username
@@ -47,7 +47,7 @@ export default function RegisterPage() {
               onChange={(e) => setUsername(e.target.value)}
               required
               minLength={3}
-              className="w-full rounded-lg border border-line bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
             />
           </div>
 
@@ -62,7 +62,7 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={8}
-              className="w-full rounded-lg border border-line bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
             />
           </div>
 
@@ -71,7 +71,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-lg bg-rail text-white font-medium py-2.5 hover:bg-rail-dark transition-colors disabled:opacity-60"
+            className="w-full rounded-lg bg-rail-green text-white font-medium py-2.5 hover:bg-rail-green-dark transition-colors disabled:opacity-60"
           >
             {submitting ? 'Creating account…' : 'Create account'}
           </button>
