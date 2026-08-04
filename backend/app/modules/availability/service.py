@@ -5,8 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.segments import decode_ranges, full_mask, segment_count as compute_segment_count
-# (add alongside your existing imports; segment_count is aliased to avoid
-# shadowing the local variable name below)
+
 from app.core.segments import leg_mask
 from app.db.models import Coach, CoachType, Seat, SeatAvailability, Station
 from app.modules.schedules.service import get_schedule_or_404

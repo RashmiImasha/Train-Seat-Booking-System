@@ -1,10 +1,6 @@
 """
 Fixtures for LIVE concurrency tests -- these hit an already-running backend
-over real HTTP, against a real Postgres database. They are deliberately
-separate from the main tests/ suite (which uses in-memory SQLite and needs
-no running server) because true concurrency guarantees can only be proven
-against Postgres: SQLite serializes writes internally regardless of what
-the application code does, so it can't actually exercise a race condition.
+over real HTTP, against a real Postgres database. 
 
 Prerequisite: the backend must already be running and reachable at
 BASE_URL (e.g. via `docker compose up`), with the hardcoded admin account
