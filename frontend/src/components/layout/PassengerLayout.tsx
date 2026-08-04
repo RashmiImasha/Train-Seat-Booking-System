@@ -8,8 +8,8 @@ const navItems = [
 
 export default function PassengerLayout() {
   return (
-    <div className="min-h-screen bg-paper flex flex-col">
-      <header className="px-4 py-3 border-b border-gray-green bg-paper-raised flex items-center gap-2">
+    <div className="min-h-screen bg-paper flex flex-col border border-red-600">
+      <header className="px-4 py-3 border-b border-gray-green bg-paper-raised flex items-center gap-2 border">
         <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true">
           <rect width="32" height="32" rx="6" fill="var(--color-rail)" />
           <path d="M8 22 L16 8 L24 22 Z" fill="none" stroke="var(--color-brass)" strokeWidth="2" strokeLinejoin="round" />

@@ -26,24 +26,19 @@ export default function LoginPage() {
         }
 
     } catch (err) {
-      setError(err instanceof ApiError ? String(err.detail ?? 'Login failed') : 'Something went wrong')
+      setError(err instanceof ApiError ? String(err.detail ?? 'Login failed') : 'If you new here, first create your account!')
     } finally {
       setSubmitting(false)
     }
   }
 
   return (
-    <div className="flex w-full items-center justify-center bg-paper ">
-      <div className="w-full max-w-sm">
+    <div className="flex w-full items-center justify-center bg-paper">
+      <div className="w-full max-w-sm ">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true">
-              <rect width="32" height="32" rx="6" fill="var(--color-rail)" />
-              <path d="M8 22 L16 8 L24 22 Z" fill="none" stroke="var(--color-brass)" strokeWidth="2" strokeLinejoin="round" />
-              <circle cx="16" cy="18" r="2" fill="var(--color-brass)" />
-            </svg>
-          </div>
-          <h1 className="font-display text-2xl text-ink">LSF Rail</h1>
+          <img src='/trainlogo.jpg' className='inline-flex items-center mb-3 w-20 h-20'/>
+
+          <h1 className="font-display text-2xl text-ink">GoRail</h1>
           <p className="text-sm text-ink/60 mt-1 font-mono tracking-wide">Colombo Fort · Badulla</p>
         </div>
 
@@ -61,7 +56,7 @@ export default function LoginPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-1 focus-visible:ring-brass/30"
             />
           </div>
 
@@ -75,7 +70,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-1 focus-visible:ring-brass/30"
             />
           </div>
 
@@ -92,9 +87,9 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-ink/60 mt-5">
+        <p className="text-center text-sm text-ink mt-5 ">
           New here?{' '}
-          <Link to="/register" className="text-rail font-medium hover:text-brass-dark">
+          <Link to="/register" className="text-deep-rail-green/50 font-semibold hover:text-rail-green">
             Create a passenger account
           </Link>
         </p>

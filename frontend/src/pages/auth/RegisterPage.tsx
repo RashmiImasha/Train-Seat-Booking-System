@@ -28,11 +28,13 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-paper">
+    <div className="w-full flex items-center justify-center px-4 bg-paper">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="font-display text-2xl text-ink">Create your account</h1>
-          <p className="text-sm text-ink/60 mt-1 font-mono tracking-wide">LSF Rail · Passenger</p>
+          <img src='/trainlogo.jpg' className='inline-flex items-center mb-3 w-20 h-20'/>
+
+          <h1 className="font-display text-2xl text-ink">GoRail</h1>
+          <p className="text-sm text-ink/60 mt-1 font-mono tracking-wide">Create your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-paper-raised rounded-2xl border border-gray-green p-6 shadow-sm">
@@ -47,7 +49,7 @@ export default function RegisterPage() {
               onChange={(e) => setUsername(e.target.value)}
               required
               minLength={3}
-              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-1 focus-visible:ring-brass/30"
             />
           </div>
 
@@ -62,7 +64,7 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={8}
-              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2 text-ink outline-none focus-visible:border-brass focus-visible:ring-1 focus-visible:ring-brass/30"
             />
           </div>
 
@@ -79,7 +81,7 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-ink/60 mt-5">
           Already have an account?{' '}
-          <Link to="/login" className="text-rail font-medium hover:text-brass-dark">
+          <Link to="/login" className="text-deep-rail-green/50 font-semibold hover:text-rail-green">
             Sign in
           </Link>
         </p>

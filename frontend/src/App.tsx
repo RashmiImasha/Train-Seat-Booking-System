@@ -18,7 +18,7 @@ import { RequireAdmin } from './auth/RequireAdmin'
 
 function App() {
   return (
-    <div className="flex max-w-full min-h-screen "         
+    <div className="flex max-w-full min-h-screen  border border-blue-600"         
     >
       <Routes>
         <Route path="/login" element={<LoginPage />} />
