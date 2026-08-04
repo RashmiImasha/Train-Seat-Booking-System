@@ -4,10 +4,13 @@ import { findSchedules, getScheduleCoaches } from '../../api/schedules'
 import { getSeatMap } from '../../api/seatmap'
 import type { Route, CoachWithSeats, SeatMapEntry } from '../../types/api'
 import { ApiError } from '../../api/client'
+import { TextInput } from '../../components/common/TextInput'
+import { SelectInput } from '../../components/common/SelectInput'
+import { PopupWindow } from '../../components/common/PopupWindow'
 
 const statusStyles: Record<SeatMapEntry['status'], string> = {
-  free: 'bg-leaf-bg border-leaf/40 text-leaf',
-  partial: 'bg-brass/20 border-brass text-brass-dark',
+  free: 'bg-leaf-bg border border-leaf/40',
+  partial: 'bg-linear-to-tr from-light-yellow to-soft-mint-green border border-soft-mint-green',
   full: 'bg-clay-bg border-clay/40 text-clay',
 }
 
@@ -63,21 +66,24 @@ export default function SeatExplorerPage() {
       <h1 className="font-display text-2xl text-ink mb-6">Seat Map</h1>
 
       <div className="space-y-3 mb-6">
-        <select
+        <SelectInput
+          label='Route:'
           value={routeId}
           onChange={(e) => setRouteId(e.target.value)}
-          className="w-full rounded-lg border border-gray-green bg-white px-3 py-2.5 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
         >
           {routes.map((r) => (
             <option key={r.id} value={r.id}>{r.name}</option>
           ))}
-        </select>
-        <input
+        </SelectInput>
+        
+        <TextInput
+          label='Date:'
           type="date"
           value={travelDate}
           onChange={(e) => setTravelDate(e.target.value)}
-          className="w-full rounded-lg border border-gray-green bg-white px-3 py-2.5 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+          className='ml-2'
         />
+
         <button
           onClick={handleFindSchedule}
           className="w-full rounded-lg bg-rail-green text-white font-medium py-2.5 hover:bg-rail-green-dark transition-colors"
@@ -86,23 +92,40 @@ export default function SeatExplorerPage() {
         </button>
 
         {coaches.length > 0 && (
-          <select
+          <SelectInput
+            label='Coach:'
             value={coachId}
-            onChange={(e) => { setCoachId(e.target.value); setSelectedSeat(null) }}
-            className="w-full rounded-lg border border-gray-green bg-white px-3 py-2.5 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+            onChange={(e) => { 
+              setCoachId(e.target.value); 
+              setSelectedSeat(null);
+            }}
           >
             {coaches.map((c) => (
-              <option key={c.id} value={c.id}>Coach {c.coach_number}</option>
+              <option key={c.id} value={c.id}>{c.coach_name} : coach no. {c.coach_number}</option>
             ))}
-          </select>
-        )}
-      </div>
+
+          </SelectInput>          
+        )}       
+        
+      </div>     
 
       {error && <p className="text-sm text-clay bg-clay-bg rounded-lg px-3 py-2 mb-4">{error}</p>}
 
+      <div className='flex flex-col '>
+        <p className='text-ink text-sm py-1 px-4 rounded-full w-fit bg-soft-mint-green/70 mb-5'>Select a seat & view bookings</p>
+
+        <div className="flex items-center justify-center gap-4 text-xs text-ink font-semibold bg-white px-4 py-2 rounded-lg ">
+            <span className="flex items-center gap-1.5"><span className="h-4 w-4 rounded bg-leaf-bg border border-leaf/40" /> Free</span>
+            <span className="flex items-center gap-1.5"><span className="h-4 w-4 rounded bg-linear-to-tr from-light-yellow to-soft-mint-green border border-soft-mint-green" /> Partially booked</span>
+            <span className="flex items-center gap-1.5"><span className="h-4 w-4 rounded bg-clay-bg border border-clay/40" /> Fully booked</span>
+        </div>
+
+      </div>
+      
       {seatMap && (
         <>
-          <div className="grid grid-cols-4 gap-2 mb-4">
+          <div className='p-5 bg-white rounded-lg mt-2 shadow-2xl'>
+            <div className="grid grid-cols-4 gap-2">
             {seatMap.map((seat) => (
               <button
                 key={seat.seat_id}
@@ -112,29 +135,29 @@ export default function SeatExplorerPage() {
                 {seat.seat_number}
               </button>
             ))}
-          </div>
-
-          <div className="flex items-center gap-4 text-xs text-ink/60 mb-6">
-            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded bg-leaf-bg border border-leaf/40" /> Free</span>
-            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded bg-conic/decreasing from-violet-700 via-lime-300 to-violet-700 border border-brass" /> Partially booked</span>
-            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded bg-clay-bg border border-clay/40" /> Fully booked</span>
-          </div>
+          </div>    
+          </div>      
 
           {selectedSeat && (
-            <div className="rounded-xl border border-gray-green bg-paper-raised p-4">
-              <p className="text-sm font-medium text-ink mb-2">Seat {selectedSeat.seat_number} bookings</p>
+            <PopupWindow
+              title={`Booking List for seat no.  ${selectedSeat.seat_number}`}
+              onClose={() => setSelectedSeat(null)}
+            >
               {selectedSeat.booked_segments.length === 0 ? (
-                <p className="text-sm text-ink/50">No bookings — fully available.</p>
+                <p className="text-center text-sm text-ink">Fully available -- still no bookings!</p>
               ) : (
-                <select className="w-full rounded-lg border border-gray-green bg-white px-3 py-2 text-sm text-ink">
+                <ul className="space-y-2">
                   {selectedSeat.booked_segments.map((seg, i) => (
-                    <option key={i}>
+                    <li
+                      key={i}
+                      className="text-sm text-ink font-mono bg-white rounded-lg border border-gray-green px-3 py-2"
+                    >
                       {seg.origin_station_name} → {seg.destination_station_name}
-                    </option>
+                    </li>
                   ))}
-                </select>
+                </ul>
               )}
-            </div>
+            </PopupWindow>
           )}
         </>
       )}

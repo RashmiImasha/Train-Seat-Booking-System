@@ -90,7 +90,7 @@ export default function BookingConfirmPage() {
           <div className="flex items-center justify-between text-sm text-ink/60">
             <span>{state.travelDate}</span>
             <span className="font-mono">
-              Coach {state.coachNumber} . {state.coachName} · Seat {state.seatNumber}
+              {state.coachName} : coach {state.coachNumber} · Seat {state.seatNumber}
             </span>
           </div>
         </div>

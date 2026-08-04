@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { useAuth } from '../../auth/useAuth'
 
 const navItems = [
   { to: '/', label: 'Search', icon: SearchIcon },
@@ -7,30 +8,40 @@ const navItems = [
 ]
 
 export default function PassengerLayout() {
-  return (
-    <div className="min-h-screen bg-paper flex flex-col border border-red-600">
-      <header className="px-4 py-3 border-b border-gray-green bg-paper-raised flex items-center gap-2 border">
-        <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true">
-          <rect width="32" height="32" rx="6" fill="var(--color-rail)" />
-          <path d="M8 22 L16 8 L24 22 Z" fill="none" stroke="var(--color-brass)" strokeWidth="2" strokeLinejoin="round" />
-          <circle cx="16" cy="18" r="2" fill="var(--color-brass)" />
-        </svg>
-        <span className="font-display font-semibold text-ink">LSF Rail</span>
+
+  const { logout } = useAuth()
+  
+  return (    
+    <div className="w-full flex flex-col justify-center bg-linear-to-r from-paper-raised to-gray-green">
+      <header className="px-4 py-2.5 w-full border-b border-gray-green flex items-center justify-between bg-rail-green/40">
+        <div className='flex items-center gap-1'>
+          <img src='/trainlogo.jpg' className='w-10 h-10'/>
+          <span className="font-display font-semibold text-ink">GoRail</span>
+        </div>
+        <div>
+          <div className="px-3 h- border hover:scale-105">
+            <button
+              onClick={logout}
+              className="w-full text-left rounded-lg px-3 py-2 text-sm font-semibold  "
+            >Sign out
+            </button>
+          </div>
+        </div>
       </header>
 
       <main className="flex-1 pb-20">
         <Outlet />
       </main>
 
-      <nav className="fixed bottom-0 inset-x-0 border-t border-gray-green bg-paper-raised flex safe-area-bottom">
+      <nav className="fixed bottom-0 inset-x-0 border-t border-gray-green flex safe-area-bottom bg-rail-green/40">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             end={item.to === '/'}
             className={({ isActive }) =>
-              `flex-1 flex flex-col items-center gap-1 py-2.5 text-xs font-medium transition-colors ${
-                isActive ? 'text-rail' : 'text-ink/50'
+              `flex-1 flex flex-col items-center gap-1 py-2.5 text-xs font-bold transition-colors ${
+                isActive ? 'text-rail-green' : 'text-ink/50'
               }`
             }
           >

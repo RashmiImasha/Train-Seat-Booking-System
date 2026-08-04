@@ -6,6 +6,8 @@ import type { Route, Station } from '../../types/api'
 import { ApiError } from '../../api/client'
 import { Button } from '../../components/common/Button'
 import { ErrorBanner } from '../../components/common/StatusBanner'
+import { SelectInput } from '../../components/common/SelectInput'
+import { TextInput } from '../../components/common/TextInput'
 
 export default function SearchPage() {
   const navigate = useNavigate()
@@ -73,16 +75,15 @@ export default function SearchPage() {
 
   return (
     <div className="px-4 py-6 max-w-md mx-auto">
-      <h1 className="font-display text-2xl text-ink mb-1">Where to?</h1>
-      <p className="text-sm text-ink/60 mb-6">Find your seat on the hill-country line.</p>
+      <h1 className="font-display text-2xl text-ink">Where to?</h1>
+      <p className="text-sm text-ink/60 mb-10">Find your seat on the hill-country line.</p>
 
-      <form onSubmit={handleSearch} className="space-y-4">
+      <form onSubmit={handleSearch} className="space-y-8">
         <div>
-          <label className="block text-sm font-medium text-ink mb-1.5">Route</label>
-          <select
+          <SelectInput
+            label='Route:'
             value={selectedRouteId}
             onChange={(e) => setSelectedRouteId(e.target.value)}
-            className="w-full rounded-lg border border-gray-green bg-white px-3 py-2.5 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
           >
             {routes.length === 0 && <option value="">No routes available</option>}
             {routes.map((r) => (
@@ -90,49 +91,52 @@ export default function SearchPage() {
                 {r.name}
               </option>
             ))}
-          </select>
+
+          </SelectInput>          
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-ink mb-1.5">From</label>
-            <select
+            <SelectInput
+              label='From:'
               value={originId}
               onChange={(e) => setOriginId(e.target.value)}
-              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2.5 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
+              className='ml-1.5'
             >
               {stations.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
                 </option>
               ))}
-            </select>
+
+            </SelectInput>
+            
           </div>
           <div>
-            <label className="block text-sm font-medium text-ink mb-1.5">To</label>
-            <select
+            <SelectInput
+              label='To:'
               value={destinationId}
               onChange={(e) => setDestinationId(e.target.value)}
-              className="w-full rounded-lg border border-gray-green bg-white px-3 py-2.5 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
             >
               {stations.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
                 </option>
               ))}
-            </select>
+              
+            </SelectInput>            
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-ink mb-1.5">Date</label>
-          <input
+          <TextInput
+            label='Date:'
             type="date"
             value={travelDate}
             onChange={(e) => setTravelDate(e.target.value)}
             required
-            className="w-full rounded-lg border border-gray-green bg-white px-3 py-2.5 text-ink outline-none focus-visible:border-brass focus-visible:ring-2 focus-visible:ring-brass/30"
-          />
+            className='ml-2'
+          />          
         </div>
 
         {error && <ErrorBanner>{error}</ErrorBanner>}

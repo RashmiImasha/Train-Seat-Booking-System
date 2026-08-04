@@ -74,10 +74,10 @@ export default function MyBookingsPage() {
                     {b.origin_station_name} → {b.destination_station_name}
                   </p>
                 </div>
-                <div className="flex items-center justify-between text-sm text-ink/60">
-                  <span>{b.travel_date}</span>
-                  <span className="font-mono">
-                    Coach {b.coach_number} . {b.coach_name} · Seat {b.seat_number}
+                <div className="flex flex-col items-start gap-y-1 font-mono justify-between text-sm text-ink/60">
+                  <span>Travel Date : {b.travel_date}</span>
+                  <span>
+                    {b.coach_name} : coach {b.coach_number} : seat no. {b.seat_number}
                   </span>
                 </div>
               </div>

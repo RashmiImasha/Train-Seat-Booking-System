@@ -13,7 +13,7 @@
     /* brand / primary actions */
   --rail-green-dark: #123832;
   
-  --leaf-bg: #e6ede0;
+ 
   --clay: #a6503c;        /* status: booked / error / unavailable */
   --clay-bg: #f3e4df;
   --line: #ddd8c6;        /* hairline borders/dividers on paper */
@@ -30,7 +30,10 @@
   --form-green: #EDF3ED;
   --gray-green: #D7E5D2;
   --leaf: #4c7a3d;    
-  --light-yellow: #c7c500;    /* status: available / success */
+  --light-yellow: #c7c500;   /* status: available / success */  
+  --leaf-bg: #e6ede0;
+  --light-orange: #DEC390;
+
 
 
 
@@ -52,6 +55,12 @@
   --color-form-green: var(--form-green);
   --color-leaf: var(--leaf);
   --color-light-yellow: var(--light-yellow);
+  --color-clay: var(--clay);
+  --color-clay-bg: var(--clay-bg);
+  --color-light-orange: var(--light-orange);
+  --color-leaf-bg: var(--leaf-bg);
+
+
 
 
 
@@ -63,9 +72,7 @@
   --color-rail-dark: var(--rail-green-dark);
   
   
-  --color-leaf-bg: var(--leaf-bg);
-  --color-clay: var(--clay);
-  --color-clay-bg: var(--clay-bg);
+  
  
   --font-display: var(--font-display);
   --font-body: var(--font-body);

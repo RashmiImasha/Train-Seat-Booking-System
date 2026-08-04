@@ -13,8 +13,8 @@ import { SectionHeader } from '../../components/common/SectionHeader.tsx'
 
 
 const statusStyles: Record<SeatMapEntry['status'], string> = {
-  free: 'bg-leaf-bg border-leaf/40 text-leaf',
-  partial: 'bg-brass/20 border-brass text-brass-dark',
+  free: 'bg-leaf-bg border border-leaf/40',
+  partial: 'bg-linear-to-tr from-light-yellow to-soft-mint-green border border-soft-mint-green',
   full: 'bg-clay-bg border-clay/40 text-clay',
 }
 
@@ -116,7 +116,7 @@ export default function AdminSeatMapPage() {
             <p className='text-ink font-semibold pb-5'>Select a seat & see it's bookings</p>
             <div className="flex items-center gap-4 text-xs text-ink font-semibold bg-white px-4 py-2">
               <span className="flex items-center gap-1.5"><span className="h-4 w-4 rounded bg-leaf-bg border border-leaf/40" /> Free</span>
-              <span className="flex items-center gap-1.5"><span className="h-4 w-4 rounded bg-linear-to-tr from-light-yellow to-soft-mint-green border border-brass" /> Partially booked</span>
+              <span className="flex items-center gap-1.5"><span className="h-4 w-4 rounded bg-linear-to-tr from-light-yellow to-soft-mint-green border border-soft-mint-green" /> Partially booked</span>
               <span className="flex items-center gap-1.5"><span className="h-4 w-4 rounded bg-clay-bg border border-clay/40" /> Fully booked</span>
             </div>
           </div>
