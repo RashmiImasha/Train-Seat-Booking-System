@@ -33,10 +33,9 @@ export default function BookingConfirmPage() {
 
   useEffect(() => {
     if (!state) return
-    getFarePreview(state.scheduleId, state.originId, state.destinationId)
+    getFarePreview(state.scheduleId, state.seatId, state.originId, state.destinationId)
       .then((r) => setFare(r.fare))
       .catch((err) => setError(err instanceof ApiError ? String(err.detail) : 'Failed to load fare'))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   if (!state) {

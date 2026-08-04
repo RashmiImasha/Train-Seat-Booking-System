@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
  
 from app.core.segments import leg_mask
 from app.db.models import Booking, BookingStatus, Coach, CoachType, Seat, SeatAvailability, Station, User, UserRole, Route, TrainSchedule
-from app.modules.fares.service import calculate_fare
+from app.modules.fares.service import calculate_fare, get_coach_name_for_seat
 from app.modules.schedules.service import get_schedule_or_404
 from app.schemas.booking import BookingCreate
 
@@ -29,6 +29,7 @@ async def create_booking(
  
     origin = await db.get(Station, payload.origin_station_id)
     destination = await db.get(Station, payload.destination_station_id)
+
     if origin is None or origin.route_id != schedule.route_id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="origin station is not on this schedule's route")
     if destination is None or destination.route_id != schedule.route_id:
@@ -65,8 +66,8 @@ async def create_booking(
             status_code=status.HTTP_409_CONFLICT,
             detail="This seat is no longer available for the requested leg -- please choose another seat or leg",
         )
- 
-    fare = await calculate_fare(db, schedule.route_id, origin.sequence_order, destination.sequence_order)
+    coach_name = await get_coach_name_for_seat(db, seat_id)
+    fare = await calculate_fare(db, schedule.route_id, origin.sequence_order, destination.sequence_order, coach_name)
  
     booking = Booking(
         seat_id=seat_id,
