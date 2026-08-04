@@ -114,7 +114,7 @@ The hardcoded admin account (see [Core Design Decisions](#authentication--rbac))
 
 ## Core Design Decisions
 
-# 1. Segment occupancy: a bitmask, not a booking-interval list
+## 1. Segment occupancy: a bitmask, not a booking-interval list
 
 Each seat's occupancy for a scheduled train is represented by a single integer called `occupied_mask`, where each bit corresponds to a route segment (the section between two consecutive stations). When a passenger books a journey, the bits representing all segments they travel through are set in the mask. To determine whether a seat is available for a requested journey, the system performs a single bitwise AND operation between the seat's current occupancy mask and the requested journey's mask. If the result is zero, the requested segments are completely free; otherwise, the journey overlaps with an existing booking. 
 
