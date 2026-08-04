@@ -1,8 +1,6 @@
 # Segment-Based Train Seat Booking System
 
-A booking system for Sri Lanka's Colombo Fort–Badulla line that lets a single reserved seat be booked independently for multiple, non-overlapping legs of the same journey — so a seat vacated partway through the trip becomes available again for someone else, and each passenger is charged only for the distance they actually travel.
-
-Built for the Lanka Software Foundation (LSF) Software Engineer interview take-home assignment.
+A booking system for Sri Lanka's Colombo Fort–Badulla line that lets a single reserved seat be booked independently for multiple, non-overlapping legs of the same journey, so a seat vacated partway through the trip becomes available again for someone else, and each passenger is charged only for the distance they actually travel.
 
 ## Table of Contents
 
@@ -19,17 +17,19 @@ Built for the Lanka Software Foundation (LSF) Software Engineer interview take-h
 
 ## Overview
 
-The reserved coaches on this line are currently booked as if reserved for the entire journey, even when a passenger only travels part of it — meaning a seat sits empty (and unsellable) once its original passenger disembarks, and partial-journey passengers are overcharged to compensate. This system fixes that by modeling seat occupancy at the **segment** level (the gap between two consecutive stations) rather than as a single whole-journey reservation, letting the same physical seat be resold for different legs and billed only for the distance travelled.
+In the current train reservation system, seats in reserved coaches are booked for the entire journey, even if a passenger travels only part of the route. As a result, once a passenger leaves the train, the seat remains unavailable for the rest of the journey, reducing seat utilization and requiring partial-journey passengers to pay higher fares to offset the unused capacity. 
+
+This project addresses the issue by implementing a segment-based seat allocation approach, where seat occupancy is managed for each segment between consecutive stations instead of the entire route. This allows the same seat to be assigned to different passengers on non-overlapping journey segments while ensuring that passengers are charged only for the distance they travel.
 
 **Roles:**
-- **Admin** (single hardcoded account) — configures routes, stations, coaches, and schedules; views all bookings and system-wide seat maps
-- **Passenger** (self-registers) — searches for a train, views seat availability for a specific leg, books a seat, views/cancels their own bookings
+- **Admin** (single hardcoded account) - configures routes, stations, coaches, and schedules; views all bookings and system-wide seat maps
+- **Passenger** (self-registers) - searches for a train, views seat availability for a specific leg, books a seat, views/cancels their own bookings
 
 ## Tech Stack
 
 | Layer | Choice |
 |---|---|
-| Backend | FastAPI (Python, async) |
+| Backend | FastAPI (Python) |
 | Database | PostgreSQL |
 | Frontend | React + Vite + TypeScript, Tailwind CSS |
 | Auth | JWT (PyJWT), bcrypt password hashing |
@@ -50,25 +50,25 @@ docker compose up -d --build
 
 The hardcoded admin account (see [Core Design Decisions](#authentication--rbac)) is seeded automatically on first backend startup — no manual setup step is needed to log in as admin.
 
-**Manual step that can't be automated away:** copying `.env.example` to `.env` — this keeps real configuration values out of version control while documenting exactly which variables the system needs.
-
 ## Core Design Decisions
 
 ### Segment occupancy: a bitmask, not a booking-interval list
 
-Each seat's occupancy for a given scheduled train is stored as a single integer — `occupied_mask` — where bit *i* represents whether segment *i* (the gap between the *i*-th and *(i+1)*-th station on the route) is currently booked. A journey from station *a* to station *b* sets bits *a* through *b−1*.
+Each seat's occupancy for a scheduled train is represented by a single integer called `occupied_mask`, where each bit corresponds to a route segment (the section between two consecutive stations). When a passenger books a journey, the bits representing all segments they travel through are set in the mask. To determine whether a seat is available for a requested journey, the system performs a single bitwise AND operation between the seat's current occupancy mask and the requested journey's mask. If the result is zero, the requested segments are completely free; otherwise, the journey overlaps with an existing booking. 
 
-This makes the core operation of the whole system — "does this leg overlap any existing booking on this seat?" — a single bitwise AND: `occupied_mask & requested_mask == 0` means free. Booking is `occupied_mask |= requested_mask`; cancelling is `occupied_mask &= ~requested_mask`. All O(1).
+Booking a seat updates the occupancy mask by setting the corresponding bits, while cancelling a booking clears those bits. These operations all **execute in constant time, O(1)**. Additionally, the bitmask size is determined dynamically from the number of stations on the route (`segment_count = station_count - 1`) rather than being hardcoded, allowing routes of different lengths to be supported without any code changes.
 
-The bitmask's width is derived at runtime from the number of stations on the route (`segment_count = station_count - 1`), not hardcoded — so adding stations to a route, or supporting a completely different route with a different station count, requires no code change.
 
 ### Fare calculation
 
-Fare = the sum of each booked segment's real distance (`distance_from_previous_km`, configured per station) × a flat rate per km. This directly fixes the problem described in the brief: a partial-journey passenger is charged for their actual distance, not a fraction of a fixed whole-route fare. A `/schedules/{id}/fare` preview endpoint lets the frontend show the exact price *before* the passenger commits — using the identical calculation used at booking time, so there's no risk of the preview and the actual charge drifting apart.
+The fare is calculated based on the actual distance travelled rather than the entire route. For each booked journey, the system sums the real distances of all travelled segments (`distance_from_previous_km`), multiplies the total by a fixed rate per kilometre, and then applies a multiplier based on the seat's coach class (1st, 2nd, or 3rd class). 
+
+This ensures that passengers are charged only for the distance they travel, addressing the overcharging problem associated with fixed whole-route fares. It also provides different pricing across reserved coach classes, reflecting the varying levels of comfort instead of charging all reserved seats the same fare. To improve transparency, the system provides a `/schedules/{id}/seats/{seat_id}/fare` preview endpoint, allowing the frontend to display the exact ticket price before the booking is confirmed. The preview uses the same fare calculation and coach-class lookup as the booking process, ensuring that the displayed price always matches the final amount charged.
+
 
 ### Concurrency: atomic conditional UPDATE
 
-The write that actually books a seat is a single SQL statement:
+The seat availability check and the booking update are performed as a single atomic database operation like below SQL statement. 
 
 ```sql
 UPDATE seat_availability
@@ -77,22 +77,28 @@ WHERE seat_id = :seat_id AND train_schedule_id = :schedule_id
   AND (occupied_mask & :new_mask) = 0
 RETURNING occupied_mask;
 ```
+*(This is the conceptual SQL; see `app/modules/bookings/service.py::create_booking` for the actual SQLAlchemy implementation.)*
 
-The overlap check and the write happen as one indivisible database operation. Two concurrent requests for overlapping legs on the same seat cannot both pass this `WHERE` clause and both succeed — whichever transaction commits first "wins"; the other affects zero rows, which the API surfaces as `409 Conflict`. This is conceptually a compare-and-swap: rather than locking the row up front (pessimistic locking) or catching a database-level constraint violation, the correctness guarantee comes directly from Postgres's row-level MVCC semantics acting on the `WHERE` clause.
+This ensures that two concurrent booking requests for overlapping segments of the same seat cannot both succeed. The transaction that commits first updates the seat occupancy, while the other transaction fails because the `WHERE` condition no longer matches, resulting in zero affected rows. The API then returns a 409 Conflict response to indicate that the seat is no longer available for the requested journey. This approach works similarly to a compare-and-swap mechanism, where the update only succeeds if the current state still matches the expected condition. Instead of relying on explicit row locking (pessimistic locking) or handling database constraint failures, the system uses PostgreSQL's row-level MVCC behavior to guarantee consistency directly through the conditional update operation.
+
 
 ### Authentication & RBAC
 
-Two roles: `admin` and `passenger`. There is exactly one admin account, its credentials hardcoded in `app/config.py` and seeded into the database automatically (idempotently) on every backend startup — deliberate, since this system only ever needs one back-office operator, not a self-service admin-management flow. Passengers self-register through `/auth/register`, which can only ever create a `passenger`-role account; there is no code path, public or otherwise, that lets a client request the `admin` role.
+The system supports two user roles:  `admin` and `passenger`. There is only one administrator account, with its credentials defined in `app/config.py` and automatically seeded into the database in an idempotent manner whenever the backend starts. This design is intentional because the system requires a single back-office operator rather than a self-service admin management workflow.
 
-Bookings are tied to `user_id` (from the authenticated JWT), not a free-text passenger name — this prevents one passenger's request from being attributed to someone else, and lets passengers list and cancel only their own bookings (enforced server-side, not just hidden in the UI).
+Passengers can create accounts through the `/user/register` endpoint, which only allows the creation of passenger-role users. No public or internal API flow allows a client to request or assign the admin role, preventing unauthorized privilege escalation.
+
+All bookings are associated with the authenticated user's `user_id` obtained from the JWT token instead of relying on a manually entered passenger name. This ensures that bookings cannot be incorrectly assigned to another person and allows passengers to **view and cancel only their own bookings**. These ownership checks are enforced at the backend level rather than depending only on frontend restrictions.
+
 
 ### Configurability
 
-Number of coaches, seats per coach, and stations per route are all admin-configurable through the API/UI, not hardcoded — verified by testing with routes of different station counts and coaches of different types/seat counts.
+The number of coaches, seats within each coach, and stations included in a route are fully configurable by admin through the API and UI rather than being fixed values in the code. The system dynamically handles different route lengths, coach types, and seat capacities, which has been verified through testing with routes containing different numbers of stations and coaches with varying configurations.
 
 ## Concurrency Correctness — Proof, Not Just Design
 
-Given this is the crux of the assignment, it's backed by live tests against real Postgres (not SQLite — SQLite serializes all writes internally regardless of application logic, so it cannot actually exercise a race condition; see `tests/live/`). Three scenarios, each fired as genuinely simultaneous requests (separate connections, separate users, `asyncio.gather`) rather than sequential calls:
+
+Since concurrency handling is a core requirement of the assignment, it is validated through live tests against a real PostgreSQL database. The tests located in `tests/live/` folder. The test suite covers three concurrent booking scenarios, each fired as genuinely simultaneous requests (separate connections, separate users, `asyncio.gather`) rather than sequential calls:
 
 | Scenario | Result |
 |---|---|
@@ -109,34 +115,36 @@ python -m pytest tests/live/ -v
 
 ## Alternatives Considered
 
-**Row-level locking (`SELECT ... FOR UPDATE`)** instead of the atomic conditional UPDATE — rejected in favor of the conditional UPDATE because it avoids an explicit lock-then-check-then-write sequence (fewer round trips, less code), while providing the same correctness guarantee. Locking becomes more attractive under very high contention on a single hot row, which isn't the expected access pattern here (many distinct seats, not thousands of requests hammering one seat).
+**Row-level locking using (`SELECT ... FOR UPDATE`)** was considered as an alternative to the atomic conditional UPDATE approach. However, the conditional update was chosen because it avoids an explicit lock–check–write sequence, reducing database round trips and keeping the implementation simpler while still providing the required correctness guarantees. Row-level locking may become more beneficial in scenarios with extremely high contention on a single database row, but that is not the expected usage pattern for this system, where booking requests are distributed across many different seats rather than thousands of requests targeting the same seat simultaneously.
 
-**Database range types + exclusion constraints** (Postgres `int4range` + `EXCLUDE USING gist`) — a strong alternative that lets the database itself refuse overlapping ranges as a data-integrity rule. Not used here because the discrete, station-aligned nature of this problem (legs are always station-to-station, never arbitrary continuous ranges) makes a bitmask simpler and faster (O(1) bitwise AND vs. an O(log n) GiST index lookup) without losing any correctness.
+**Database range types + exclusion constraints** (Postgres `int4range` + `EXCLUDE USING gist`) were considered as an alternative for preventing overlapping bookings at the database level. However, they were not used because journeys are always defined by fixed station-to-station segments. A bitmask provides a simpler and faster solution with constant-time (O(1)) overlap checks using bitwise operations while maintaining the same correctness.
 
-**Serializable transaction isolation** — would also work, but requires explicit retry-on-conflict handling in application code for a guarantee the conditional UPDATE already provides with less complexity.
+**Serializable transaction isolation** was considered as another concurrency solution, but it would require additional retry handling in the application when conflicts occur. The atomic conditional update approach provides the required guarantee with less complexity.
 
-**Auto-assigned seats vs. passenger-chosen seats** — passengers explicitly choose their seat from the seat map (like most real booking systems), rather than the system auto-assigning one; this was a deliberate product decision, not a technical constraint.
+**Auto-assigned seats vs. passenger-chosen seats** - the system allows passengers to select their preferred seat directly from the seat map, following the approach used by many real booking systems. This was a deliberate product choice rather than a technical limitation.
+
 
 ## Challenges Faced
 
-- **CORS during frontend/backend integration**: writes from the browser initially failed at the preflight `OPTIONS` step (405) before reaching any route handler, since no CORS middleware was configured — resolved by adding `CORSMiddleware` with an explicit allowed-origins list.
-- **Provisioning order dependency**: `seat_availability` rows are only created for seats that exist on a route's reserved coaches *at the time a schedule is created* — a coach added after schedule creation has no seats available for that schedule. This is a known ordering constraint (documented in code comments) rather than a bug: coach/route configuration should be finalized before scheduling a specific date.
-- **Distinguishing true concurrency from serialized concurrency**: an early version of this system's concurrency test ran against SQLite and technically "passed," but for the wrong reason — SQLite's single-writer lock serializes all writes regardless of application logic, so the test proved nothing about the actual database-level guarantee. Switching the concurrency proof to run against real Postgres was necessary to make the test meaningful.
+
+- **CORS during frontend/backend integration**: Browser requests initially failed during the preflight `OPTIONS` check because CORS middleware was not configured. This was resolved by adding CORSMiddleware with an explicit allowed-origin configuration.- 
+- **Provisioning order dependency**: `seat_availability` records are created only for seats that exist when a schedule is created. Therefore, coaches should be configured before creating schedules. This is a documented workflow constraint rather than a system bug.  
+- **Concurrency testing accuracy**: an early version of this system's concurrency test ran against SQLite and technically "passed," but for the wrong reason SQLite's single-writer lock serializes all writes regardless of application logic, so the test proved nothing about the actual database-level guarantee. Switching the concurrency proof to run against real Postgres was necessary to make the test meaningful.
 
 ## Extra Credit
 
-**Seat map visualization** — implemented for both admin and passenger views. Seats are color-coded (free / partially booked / fully booked for the full route) and clicking a seat shows its exact booked segment ranges (e.g., "Colombo Fort → Kandy") as a plain list, not a selection control, since the information is purely informational rather than something to be picked.
+**Seat map visualization** : Implemented for both admin and passenger views. Seats are color-coded (free / partially booked / fully booked for the full route) and clicking a seat shows its exact booked segment ranges (e.g., "Colombo Fort → Kandy") as a plain list rather than a selection control, since the data is intended for viewing only.
 
-**Admin booking view** — a filterable (by status, by date) table of all bookings system-wide, with a running total of confirmed-booking count and income (or cancelled-booking count and lost revenue, depending on the active filter), computed live from whatever's currently loaded rather than tracked separately — so it can never drift out of sync with the actual filtered data.
+**Admin booking view** : a filterable (by status, by date) table of all bookings, with a running total of confirmed-booking count and income (or cancelled-booking count and lost revenue, depending on the active filter), computed live from whatever's currently loaded rather than tracked separately.
 
-*(Waitlisting and fare logic beyond flat per-km pricing were considered and designed conceptually but not implemented, given time constraints and the assignment's explicit guidance to prioritize a solid core over a longer extra-credit list.)*
+**Fare Calculation**: The fare is calculated based on the actual distance travelled. For each booked journey, the system sums the real distances of all travelled segments, multiplies the total by a fixed rate per kilometre, and then applies a multiplier based on the seat's coach class (1st, 2nd, or 3rd class). 
+
 
 ## Known Limitations / Future Work
 
 - No waitlisting for fully-booked segments.
-- Fare logic is flat-rate-per-km only; no peak pricing, demand-based pricing, or coach-type multipliers.
-- No real-time (push/poll) refresh of seat availability in the UI — a `409 Conflict` on booking is the mechanism for catching a seat taken moments earlier, rather than proactive live updates.
-- Schema migrations are currently handled via `create_all` at startup rather than Alembic migrations (Alembic is included in dependencies but not yet wired up) — fine for the current stage of development, but would need proper migrations before further schema evolution against a database with real data.
+- No real-time seat availability updates: The UI does not use push notifications or continuous polling to refresh seat availability. Instead, the system relies on the atomic booking process, where a 409 Conflict response handles cases where a seat becomes unavailable between viewing the seat map and confirming the booking. This keeps the implementation simpler while maintaining correctness.
+- Database migrations: The current implementation uses `create_all` during application startup to create database tables. While this is sufficient for the current development stage, Alembic is already included as a dependency and should be configured before future schema changes are applied to databases containing real production data.
 
 ## Project Structure
 
@@ -144,25 +152,25 @@ python -m pytest tests/live/ -v
 ├── backend/
 │   ├── app/
 │   │   ├── main.py              # app entrypoint, CORS, admin seeding
-│   │   ├── config.py             # settings, hardcoded admin credentials
-│   │   ├── core/                  # segment math, JWT/password helpers, shared validation
-│   │   ├── db/                     # SQLAlchemy models, session
-│   │   ├── schemas/                 # Pydantic request/response models
-│   │   └── modules/                  # one folder per domain: routes, coaches,
-│   │                                    schedules, availability, bookings, fares, auth
+│   │   ├── config.py            # settings, hardcoded admin credentials
+│   │   ├── core/                # segment math, JWT/password helpers, shared validation
+│   │   ├── db/                  # SQLAlchemy models, session
+│   │   ├── schemas/             # Pydantic request/response models
+│   │   └── modules/             # one folder per domain: routes, coaches, schedules, availability, bookings, fares, auth
+│   │                                    
 │   ├── tests/
-│   │   ├── conftest.py             # SQLite fixtures for fast unit/integration tests
-│   │   └── live/                    # Postgres-backed concurrency proof tests
+│   │   ├── live/                # Postgres-backed concurrency proof tests
+│   │                   
 │   ├── Dockerfile
 │   └── requirements.txt
 ├── frontend/
 │   ├── src/
-│   │   ├── api/                    # one module per backend domain
-│   │   ├── auth/                    # JWT context, route guards
-│   │   ├── components/               # SeatMap, layout shells, shared UI
+│   │   ├── api/                  # one module per backend domain
+│   │   ├── auth/                 # JWT context, route guards
+│   │   ├── components/           # SeatMap, layout shells, shared UI
 │   │   └── pages/
-│   │       ├── admin/                 # routes, schedules, seat map, bookings
-│   │       └── passenger/              # search, seat map, confirm, my bookings
+│   │       ├── admin/            # routes, schedules, seat map, bookings
+│   │       └── passenger/        # search, seat map, confirm, my bookings
 │   ├── Dockerfile
 │   └── nginx.conf
 └── docker-compose.yml
