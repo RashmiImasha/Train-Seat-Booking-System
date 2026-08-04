@@ -37,89 +37,48 @@ Watch the full system demonstration here:
 
 ## Architecture Diagram
 
-## Architecture Overview
-
 ```mermaid
 flowchart TB
 
-    %% Users
-    Admin[Admin<br/>Back-office Operator]
-    Passenger[Passenger<br/>Books Train Seats]
+    Admin[Admin]
+    Passenger[Passenger]
 
-    %% Frontend
-    Frontend["Frontend (SPA)<br/>
-    React + Vite + TypeScript<br/>
-    Served by Nginx"]
+    Frontend["React SPA<br/>Vite + TypeScript"]
 
-    %% Backend
-    Backend["Backend API Container<br/>
-    FastAPI + Python + Async"]
+    Backend["FastAPI Backend<br/>REST API"]
 
-    %% Backend components
-    API["API Routers<br/>
-    REST Endpoints"]
+    Modules["Core Services<br/>
+    Auth & RBAC<br/>
+    Routes / Coaches / Schedules<br/>
+    Booking Engine"]
 
-    Auth["Authentication & RBAC<br/>
-    JWT Tokens<br/>
-    Password Hashing"]
+    Logic["Segment-based Seat Logic<br/>
+    Bitmask Availability"]
 
-    Config["Admin Configuration<br/>
-    Routes<br/>
-    Stations<br/>
-    Coaches<br/>
-    Schedules"]
+    DB[PostgreSQL<br/>]
 
-    Booking["Booking Engine<br/>
-    Availability<br/>
-    Reservations<br/>
-    Fare Calculation"]
+    Admin --> Frontend
+    Passenger --> Frontend
 
-    Core["Shared Core<br/>
-    Segment-based Seat Logic<br/>
-    Bitmask Operations<br/>
-    Validation"]
+    Frontend -->|JWT + REST| Backend
 
-    Database["PostgreSQL Database<br/>
-    SQLAlchemy Models<br/>
-    AsyncPG"]
-
-    %% User interactions
-    Admin -->|HTTPS| Frontend
-    Passenger -->|HTTPS| Frontend
-
-    %% Frontend communication
-    Frontend -->|REST API + JWT Authentication| Backend
-
-    %% Backend flow
-    Backend --> API
-
-    API --> Auth
-    API --> Config
-    API --> Booking
-
-    %% Core logic
-    Auth --> Core
-    Config --> Core
-    Booking --> Core
-
-    %% Database
-    Core -->|SQLAlchemy ORM| Database
+    Backend --> Modules
+    Modules --> Logic
+    Logic --> DB
 
 
-    %% Styling
     classDef user fill:#f5f3eb,stroke:#555,color:#333
     classDef frontend fill:#dff5ed,stroke:#147d64,color:#145544
     classDef backend fill:#e8e8ff,stroke:#4b4bb7,color:#333
-    classDef component fill:#e5f1ff,stroke:#2c6db2,color:#163b66
-    classDef core fill:#ffe9dd,stroke:#c75b32,color:#7a2e13
+    classDef logic fill:#ffe9dd,stroke:#c75b32,color:#7a2e13
     classDef database fill:#f5f3eb,stroke:#777,color:#333
 
     class Admin,Passenger user
     class Frontend frontend
-    class Backend,API backend
-    class Auth,Config,Booking component
-    class Core core
-    class Database database
+    class Backend backend
+    class Modules backend
+    class Logic logic
+    class DB database
 ```
 
 ---
